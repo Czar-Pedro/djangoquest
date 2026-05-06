@@ -62,3 +62,26 @@ class Item(models.Model):
 
     def __str__(self):
         return f"{self.nome} ({self.get_tipo_display()})"
+    
+class Inventario(models.Model):
+     personagem = models.ForeignKey(Personagem, on_delete=models.CASCADE)
+     item = models.ForeignKey(Item, on_delete=models.CASCADE)
+     qtd = models.IntegerField(default=1)
+
+     def __str__(self):
+        return f"{self.personagem.nome} - {self.item.nome} x{self.qtd}" 
+     
+class Batalha(models.Model):
+    RESULTADOS = [
+        ('derrota', 'DERROTA'),
+        ('vitoria', 'VITORIA'),
+        ('fuga', 'FUGA'),
+
+
+    ]
+    personagem = models.ForeignKey(Personagem, on_delete=models.CASCADE),
+    inimigo = models.ForeignKey(Inimigo, on_delete=models.CASCADE),
+    resultado = models.CharField(max_length= 10, choices= RESULTADOS),
+    data = models.DateField(auto_now_add=True),
+    def __str__(self):
+        return f"{self.personagem.nome} vs {self.inimigo.nome} - {self.resultado}"
