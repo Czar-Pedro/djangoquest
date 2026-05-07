@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - cadastro</title>
+</head>
+<body>
+    <h1>Django Quest</h1>
+    <h2>cadastro</h2>
+{% if erro %}
+    <p style="color:red;">{{ erro }}</p>
+{% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <label>Usuário:</label>
+        <input type="text" name="usuario"><br><br>
+        <label>Senha:</label>
+        <input type="password" name="senha"><br><br>
+        <button type="submit">cadastrar</button>
+    </form>
+    <p>ja tem uma conta? <a href="{% url 'login' %}">entre por aqui</a></p>
+</body>
+</html>
