@@ -1,6 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+AREAS = [
+        ('floresta', 'Floresta'),
+        ('caverna', 'Caverna'),
+        ('castelo', 'Castelo'),
+    ]
+
 class Personagem(models.Model):
     CLASSES = [
         ('guerreiro', 'Guerreiro'),
@@ -21,17 +27,16 @@ class Personagem(models.Model):
     ataque = models.IntegerField(default=10)
     defesa = models.IntegerField(default=5)
     gold = models.IntegerField(default=100)
+    area_atual = models.CharField(max_length=100, choices=AREAS)
+    batalhas_na_area = models.IntegerField(default=0)
+    fugas_restantes = models.IntegerField(default=2)
+    area_desbloqueada = models.CharField(max_length=20, choices=AREAS, default='floresta')
 
     def __str__(self):
         return f"{self.nome} - Nível {self.nivel}"
 
 class Inimigo(models.Model):
-    AREAS = [
-        ('floresta', 'Floresta'),
-        ('caverna', 'Caverna'),
-        ('castelo', 'Castelo'),
-    ]
-
+    
     nome = models.CharField(max_length=100)
     area = models.CharField(max_length=20, choices=AREAS)
     hp = models.IntegerField()
