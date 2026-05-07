@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Criar Personagem</title>
+</head>
+<body>
+    <h1>Django Quest</h1>
+    <h2>Crie seu Personagem</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Nome do Personagem:</label>
+        <input type="text" name="nome"><br><br>
+        <label>Escolha sua Classe:</label>
+        <select name="classe">
+            <option value="guerreiro">Guerreiro</option>
+            <option value="mago">Mago</option>
+            <option value="ladrao">Ladrão</option>
+            <option value="arqueiro">Arqueiro</option>
+        </select><br><br>
+        <button type="submit">Criar Personagem</button>
+    </form>
+</body>
+</html>

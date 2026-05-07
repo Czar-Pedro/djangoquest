@@ -7,4 +7,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('criar-personagem/', views.criar_personagem, name='criar_personagem'),
+    path('mapa/', views.mapa, name='mapa'),
 ]
+def mapa(request):
+    return render(request, 'game/mapa.html')

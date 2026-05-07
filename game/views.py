@@ -33,4 +33,32 @@ def logout_view(request):
     return redirect('login')
 
 def criar_personagem(request):
+    if request.method == 'POST':
+        nome = request.POST['nome']
+        classe = request.POST['classe']
+        
+        ATRIBUTOS = {
+            'guerreiro': {'hp': 150, 'mp': 20, 'ataque': 15, 'defesa': 10},
+            'mago':      {'hp': 70,  'mp': 100,'ataque': 8,  'defesa': 3},
+            'ladrao':    {'hp': 90,  'mp': 40, 'ataque': 12, 'defesa': 6},
+            'arqueiro':  {'hp': 100, 'mp': 30, 'ataque': 13, 'defesa': 5},
+        }
+        
+        atributos = ATRIBUTOS[classe]
+        
+        Personagem.objects.create(
+            usuario=request.user,
+            nome=nome,
+            classe=classe,
+            hp_maximo=atributos['hp'],
+            hp_atual=atributos['hp'],
+            mp_maximo=atributos['mp'],
+            mp_atual=atributos['mp'],
+            ataque=atributos['ataque'],
+            defesa=atributos['defesa'],
+        )
+        return redirect('mapa')
     return render(request, 'game/criar_personagem.html')
+
+def mapa(request):
+    return render(request, 'game/mapa.html')
