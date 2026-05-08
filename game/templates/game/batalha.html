@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Batalha</title>
+    <style>
+        .secao { display: none; }
+        .secao.ativa { display: block; }
+        #painel-itens { display: none; }
+    </style>
+</head>
+<body>
+    <h1>⚔️ Batalha!</h1>
+
+    <h2>{{ inimigo.nome }} {% if inimigo.is_boss %}👑{% endif %}</h2>
+    <p>HP: {{ inimigo_hp }}/{{ inimigo.hp }}</p>
+
+    <hr>
+
+    <h2>{{ personagem.nome }}</h2>
+    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+    <p>MP: {{ personagem.mp_atual }}/{{ personagem.mp_maximo }}</p>
+
+    {% if mensagem %}
+        <p><strong>{{ mensagem }}</strong></p>
+    {% endif %}
+
+    <h3>O que fazer?</h3>
+    <form method="POST" action="{% url 'acao_batalha' %}">
+        {% csrf_token %}
+        <button type="submit" name="acao" value="atacar">⚔️ Atacar</button>
+        <button type="submit" name="acao" value="defender">🛡️ Defender</button>
+        <button type="submit" name="acao" value="fugir">🏃 Fugir ({{ personagem.fugas_restantes }} restantes)</button>
+    </form>
+    <button onclick="toggleItens()">🎒 Itens</button>
+
+    <!-- painel de itens -->
+    <div id="painel-itens">
+        <h3>Inventário</h3>
+        <button onclick="mostrar('armas')">⚔️ Armas</button>
+        <button onclick="mostrar('armaduras')">🛡️ Armaduras</button>
+        <button onclick="mostrar('consumiveis')">🧪 Consumíveis</button>
+
+        <div id="armas" class="secao">
+            <h4>Armas</h4>
+            {% for inv in inventario %}
+                {% if inv.item.tipo == 'arma' %}
+                    <p>{{ inv.item.nome }} x{{ inv.qtd }} — Ataque +{{ inv.item.bonus_ataque }}</p>
+                {% endif %}
+            {% empty %}
+                <p>Nenhuma arma.</p>
+            {% endfor %}
+        </div>
+
+        <div id="armaduras" class="secao">
+            <h4>Armaduras</h4>
+            {% for inv in inventario %}
+                {% if inv.item.tipo == 'armadura' %}
+                    <p>{{ inv.item.nome }} x{{ inv.qtd }} — Defesa +{{ inv.item.bonus_defesa }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div id="consumiveis" class="secao">
+            <h4>Consumíveis</h4>
+            {% for inv in inventario %}
+                {% if inv.item.tipo == 'consumivel' %}
+                    <form method="POST" action="{% url 'usar_item_batalha' inv.item.id %}">
+                        {% csrf_token %}
+                        <p>{{ inv.item.nome }} x{{ inv.qtd }}
+                           {% if inv.item.bonus_hp > 0 %} +{{ inv.item.bonus_hp }} HP{% endif %}
+                           {% if inv.item.bonus_mp > 0 %} +{{ inv.item.bonus_mp }} MP{% endif %}
+                           <button type="submit">Usar</button>
+                        </p>
+                    </form>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+    <p>Batalha {{ personagem.batalhas_na_area }}/5</p>
+
+    <script>
+        function toggleItens() {
+            const painel = document.getElementById('painel-itens');
+            painel.style.display = painel.style.display === 'none' ? 'block' : 'none';
+            if (painel.style.display === 'block') mostrar('consumiveis');
+        }
+        function mostrar(secao) {
+            document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+            document.getElementById(secao).classList.add('ativa');
+        }
+    </script>
+</body>
+</html>

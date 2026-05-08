@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from .models import Personagem, Item, Inventario
+from .models import Personagem, Item, Inventario, Batalha, Inimigo
 
 # página inicial — verifica se o usuário está logado e redireciona
 def index(request):
@@ -241,3 +241,254 @@ def vender_item(request, item_id):
             inventario_item.delete()
     
     return redirect('loja')
+import random
+
+
+# inicia uma nova batalha sorteando um inimigo da área
+def iniciar_batalha(request):
+    # pega o personagem da sessão
+    personagem_id = request.session.get('personagem_id')
+    if not personagem_id:
+        return redirect('selecionar_personagem')
+    personagem = Personagem.objects.get(id=personagem_id)
+    
+    # verifica quantas batalhas já fez na área
+    if personagem.batalhas_na_area >= 5:
+        return redirect('vila', area=personagem.area_atual)
+    
+    # batalha 5 é sempre o boss
+    if personagem.batalhas_na_area == 4:
+        inimigo = Inimigo.objects.filter(area=personagem.area_atual, is_boss=True).first()
+    else:
+        # sorteia um inimigo normal da área
+        inimigos = Inimigo.objects.filter(area=personagem.area_atual, is_boss=False)
+        inimigo = random.choice(list(inimigos))
+    
+    # salva o estado da batalha na sessão
+    request.session['batalha'] = {
+        'inimigo_id': inimigo.id,
+        'inimigo_hp': inimigo.hp,
+        'defendendo': False,
+    }
+    
+    return render(request, 'game/batalha.html', {
+        'personagem': personagem,
+        'inimigo': inimigo,
+        'inimigo_hp': inimigo.hp,
+        'mensagem': f'Um {inimigo.nome} apareceu!',
+        'inventario': Inventario.objects.filter(personagem=personagem),
+    })
+
+
+# processa a ação do jogador no turno
+def acao_batalha(request):
+    if request.method != 'POST':
+        return redirect('iniciar_batalha')
+    
+    # pega o personagem e o estado da batalha
+    personagem_id = request.session.get('personagem_id')
+    personagem = Personagem.objects.get(id=personagem_id)
+    batalha = request.session.get('batalha')
+    inimigo = Inimigo.objects.get(id=batalha['inimigo_id'])
+    inimigo_hp = batalha['inimigo_hp']
+    
+    # pega a ação escolhida pelo jogador
+    acao = request.POST.get('acao')
+    mensagem = ''
+    
+    # --- AÇÃO: ATACAR ---
+    if acao == 'atacar':
+        # calcula dano do personagem ao inimigo
+        dano = max(1, personagem.ataque - inimigo.defesa)
+        inimigo_hp -= dano
+        mensagem = f'Você causou {dano} de dano ao {inimigo.nome}!'
+    
+    # --- AÇÃO: DEFENDER ---
+    elif acao == 'defender':
+        batalha['defendendo'] = True
+        mensagem = 'Você assume postura defensiva!'
+    
+    # --- AÇÃO: FUGIR ---
+    elif acao == 'fugir':
+        # boss não pode fugir
+        if inimigo.is_boss:
+            mensagem = 'Não é possível fugir de um boss!'
+        elif personagem.fugas_restantes <= 0:
+            mensagem = 'Você não tem mais fugas disponíveis!'
+        else:
+            # 70% de chance de fugir
+            if random.random() < 0.7:
+                # perde 10% do ouro
+                personagem.gold = int(personagem.gold * 0.9)
+                personagem.fugas_restantes -= 1
+                personagem.save()
+                # fuga
+                b = Batalha()
+                b.personagem = personagem
+                b.inimigo = inimigo
+                b.resultado = 'fuga'
+                b.save()
+
+                return redirect('resultado_batalha')
+            else:
+                personagem.fugas_restantes -= 1
+                personagem.save()
+                mensagem = 'Fuga falhou! O inimigo bloqueou sua saída!'
+    
+    # --- INIMIGO ATACA ---
+    if inimigo_hp > 0:
+        # calcula defesa atual (30% a mais se defendendo)
+        defesa_atual = int(personagem.defesa * 1.3) if batalha['defendendo'] else personagem.defesa
+        # calcula dano do inimigo ao personagem
+        dano_inimigo = max(1, inimigo.ataque - defesa_atual)
+        personagem.hp_atual -= dano_inimigo
+        mensagem += f' {inimigo.nome} causou {dano_inimigo} de dano em você!'
+        # reseta o estado de defesa
+    batalha['defendendo'] = False
+    
+    # --- VERIFICA SE O INIMIGO MORREU ---
+    if inimigo_hp <= 0:
+        # adiciona experiência e gold ao personagem
+        personagem.experiencia += inimigo.experiencia
+        personagem.gold += inimigo.gold
+        personagem.batalhas_na_area += 1
+        personagem.save()
+        # vitória
+        b = Batalha()
+        b.personagem = personagem
+        b.inimigo = inimigo
+        b.resultado = 'vitoria'
+        b.save()
+
+        # salva resultado na sessão
+        request.session['resultado'] = {
+            'resultado': 'vitoria',
+            'inimigo_nome': inimigo.nome,
+            'exp_ganho': inimigo.experiencia,
+            'gold_ganho': inimigo.gold,
+        }
+        return redirect('resultado_batalha')
+    
+    # --- VERIFICA SE O PERSONAGEM MORREU ---
+    if personagem.hp_atual <= 0:
+        # perde todo o ouro voltando ao checkpoint
+        personagem.gold = personagem.gold_salvo
+        personagem.hp_atual = personagem.hp_maximo
+        personagem.save()
+        # derrota
+        b = Batalha()
+        b.personagem = personagem
+        b.inimigo = inimigo
+        b.resultado = 'derrota'
+        b.save()
+        request.session['resultado'] = {
+            'resultado': 'derrota',
+            'inimigo_nome': inimigo.nome,
+        }
+        return redirect('resultado_batalha')
+    
+    # atualiza o estado da batalha na sessão
+    batalha['inimigo_hp'] = inimigo_hp
+    request.session['batalha'] = batalha
+    personagem.save()
+    
+    return render(request, 'game/batalha.html', {
+        'personagem': personagem,
+        'inimigo': inimigo,
+        'inimigo_hp': inimigo_hp,
+        'mensagem': mensagem,
+        'inventario': Inventario.objects.filter(personagem=personagem),
+    })
+
+
+# usa um item consumível durante a batalha, custando uma ação do turno
+def usar_item_batalha(request, item_id):
+    if request.method != 'POST':
+        return redirect('iniciar_batalha')
+    
+    # pega o personagem e o estado atual da batalha
+    personagem_id = request.session.get('personagem_id')
+    personagem = Personagem.objects.get(id=personagem_id)
+    batalha = request.session.get('batalha')
+    inimigo = Inimigo.objects.get(id=batalha['inimigo_id'])
+    inimigo_hp = batalha['inimigo_hp']
+    
+    # busca o item no inventário do personagem, garantindo que é consumível
+    inventario_item = Inventario.objects.filter(personagem=personagem, item__id=item_id, item__tipo='consumivel').first()
+    
+    if inventario_item:
+        item = inventario_item.item
+        
+        # aplica cura de HP sem ultrapassar o máximo
+        personagem.hp_atual = min(personagem.hp_maximo, personagem.hp_atual + item.bonus_hp)
+        # aplica recuperação de MP sem ultrapassar o máximo
+        personagem.mp_atual = min(personagem.mp_maximo, personagem.mp_atual + item.bonus_mp)
+        
+        # monta a mensagem de uso do item
+        mensagem = f'Você usou {item.nome}!'
+        if item.bonus_hp > 0:
+            mensagem += f' +{item.bonus_hp} HP'
+        if item.bonus_mp > 0:
+            mensagem += f' +{item.bonus_mp} MP'
+        
+        # remove 1 unidade do inventário, ou deleta o registro se era o último
+        if inventario_item.qtd > 1:
+            inventario_item.qtd -= 1
+            inventario_item.save()
+        else:
+            inventario_item.delete()
+    else:
+        # item não encontrado ou não é consumível
+        mensagem = 'Item não encontrado no inventário!'
+    
+    # inimigo ataca em resposta ao turno gasto
+    if inimigo_hp > 0:
+        dano_inimigo = max(1, inimigo.ataque - personagem.defesa)
+        personagem.hp_atual -= dano_inimigo
+        mensagem += f' {inimigo.nome} causou {dano_inimigo} de dano em você!'
+    
+    # verifica se o personagem morreu após o ataque do inimigo
+    if personagem.hp_atual <= 0:
+        # reverte o ouro para o último checkpoint salvo na vila
+        personagem.gold = personagem.gold_salvo
+        # ressuscita o personagem com HP cheio
+        personagem.hp_atual = personagem.hp_maximo
+        # reseta o progresso da área
+        personagem.batalhas_na_area = 0
+        personagem.fugas_restantes = 2
+        personagem.save()
+        # registra a derrota no banco
+        b = Batalha(personagem=personagem, inimigo=inimigo, resultado='derrota')
+        b.save()
+        request.session['resultado'] = {
+            'resultado': 'derrota',
+            'inimigo_nome': inimigo.nome,
+        }
+        return redirect('resultado_batalha')
+    
+    # atualiza o hp do inimigo na sessão
+    batalha['inimigo_hp'] = inimigo_hp
+    request.session['batalha'] = batalha
+    personagem.save()
+    
+    # busca o inventário atualizado para renderizar na tela
+    inventario = Inventario.objects.filter(personagem=personagem)
+    
+    return render(request, 'game/batalha.html', {
+        'personagem': personagem,
+        'inimigo': inimigo,
+        'inimigo_hp': inimigo_hp,
+        'mensagem': mensagem,
+        'inventario': inventario,
+    })
+
+
+# mostra o resultado final da batalha
+def resultado_batalha(request):
+    personagem_id = request.session.get('personagem_id')
+    personagem = Personagem.objects.get(id=personagem_id)
+    resultado = request.session.get('resultado', {})
+    return render(request, 'game/resultado_batalha.html', {
+        'personagem': personagem,
+        'resultado': resultado,
+    })

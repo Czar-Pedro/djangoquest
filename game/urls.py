@@ -15,4 +15,8 @@ urlpatterns = [
     path('loja/', views.loja, name='loja'),
     path('loja/comprar/<int:item_id>/', views.comprar_item, name='comprar_item'),
     path('loja/vender/<int:item_id>/', views.vender_item, name='vender_item'),
+    path('batalha/', views.iniciar_batalha, name='iniciar_batalha'),
+    path('batalha/acao/', views.acao_batalha, name='acao_batalha'),
+    path('batalha/resultado/', views.resultado_batalha, name='resultado_batalha'),
+    path('batalha/item/<int:item_id>/', views.usar_item_batalha, name='usar_item_batalha'),
 ]

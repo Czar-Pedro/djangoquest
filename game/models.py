@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 AREAS = [
         ('floresta', 'Floresta'),
@@ -77,17 +78,18 @@ class Inventario(models.Model):
      def __str__(self):
         return f"{self.personagem.nome} - {self.item.nome} x{self.qtd}" 
      
+
+
 class Batalha(models.Model):
     RESULTADOS = [
         ('derrota', 'DERROTA'),
         ('vitoria', 'VITORIA'),
         ('fuga', 'FUGA'),
-
-
     ]
-    personagem = models.ForeignKey(Personagem, on_delete=models.CASCADE),
-    inimigo = models.ForeignKey(Inimigo, on_delete=models.CASCADE),
-    resultado = models.CharField(max_length= 10, choices= RESULTADOS),
-    data = models.DateField(auto_now_add=True),
+    personagem = models.ForeignKey(Personagem, on_delete=models.CASCADE, null=True)
+    inimigo = models.ForeignKey(Inimigo, on_delete=models.CASCADE, null=True)
+    resultado = models.CharField(max_length=10, choices=RESULTADOS, null=True)
+    data = models.DateField(default=timezone.now)
+
     def __str__(self):
-        return f"{self.personagem.nome} vs {self.inimigo.nome} - {self.resultado}"
+        return f"{self.personagem} vs {self.inimigo} - {self.resultado}"

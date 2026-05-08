@@ -53,7 +53,7 @@
     <div id="vender" class="secao">
         <h2>Vender Itens</h2>
         {% for inv in inventario %}
-            <p>{{ inv.item.nome }} x{{ inv.qtd }} — Vender por {{ inv.item.preco|divisibleby:2 }} 🪙
+            <p>{{ inv.item.nome }} x{{ inv.qtd }} — Vender por {% widthratio inv.item.preco 2 1 %} 🪙
                 <a href="{% url 'vender_item' inv.item.id %}">Vender</a>
             </p>
         {% endfor %}
