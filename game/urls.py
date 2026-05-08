@@ -9,6 +9,6 @@ urlpatterns = [
     path('criar-personagem/', views.criar_personagem, name='criar_personagem'),
     path('mapa/', views.mapa, name='mapa'),
     path('vila/<str:area>/', views.vila, name='vila'),
+    path('selecionar-personagem/', views.selecionar_personagem, name='selecionar_personagem'),
+    path('entrar-personagem/<int:personagem_id>/', views.entrar_personagem, name='entrar_personagem'),
 ]
-def mapa(request):
-    return render(request, 'game/mapa.html')

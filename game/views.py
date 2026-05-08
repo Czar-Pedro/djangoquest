@@ -5,6 +5,9 @@ from .models import Personagem
 
 def index(request):
     if request.user.is_authenticated:
+        personagens = Personagem.objects.filter(usuario=request.user)
+        if personagens.exists():
+            return redirect('selecionar_personagem')
         return redirect('criar_personagem')
     return redirect('login')
 
@@ -25,6 +28,9 @@ def login_view(request):
         user = authenticate(request, username=usuario, password=senha)
         if user:
             login(request, user)
+            personagens = Personagem.objects.filter(usuario=user)
+            if personagens.exists():
+                return redirect('selecionar_personagem')
             return redirect('criar_personagem')
     return render(request, 'game/login.html')
 
@@ -61,7 +67,24 @@ def criar_personagem(request):
     return render(request, 'game/criar_personagem.html')
 
 def mapa(request):
-    personagem = Personagem.objects.filter(usuario=request.user).first()
-    if not personagem:
-        return redirect('criar_personagem')
+    personagem_id = request.session.get('personagem_id')
+    if not personagem_id:
+        return redirect('selecionar_personagem')
+    personagem = Personagem.objects.get(id=personagem_id)
     return render(request, 'game/mapa.html', {'personagem': personagem})
+
+def selecionar_personagem(request):
+    personagens = Personagem.objects.filter(usuario=request.user)
+    return render(request, 'game/selecionar_personagem.html', {'personagens': personagens})
+
+def entrar_personagem(request, personagem_id):
+    personagem = Personagem.objects.get(id=personagem_id, usuario=request.user)
+    request.session['personagem_id'] = personagem_id
+    return redirect('mapa')
+
+def vila(request, area):
+    personagem_id = request.session.get('personagem_id')
+    if not personagem_id:
+        return redirect('selecionar_personagem')
+    personagem = Personagem.objects.get(id=personagem_id)
+    return render(request, 'game/vila.html', {'personagem': personagem, 'area': area})

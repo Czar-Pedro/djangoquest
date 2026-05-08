@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Selecionar Personagem</title>
+</head>
+<body>
+    <h1>Django Quest</h1>
+    <h2>Escolha seu Personagem</h2>
+
+    {% for personagem in personagens %}
+        <p>{{ personagem.nome }} - {{ personagem.get_classe_display }} - Nível {{ personagem.nivel }}</p>
+        <a href="{% url 'entrar_personagem' personagem.id %}">Jogar com este</a><br><br>
+    {% endfor %}
+
+    <a href="{% url 'criar_personagem' %}">Criar novo personagem</a><br>
+    <a href="{% url 'logout' %}">Sair</a>
+</body>
+</html>
