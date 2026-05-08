@@ -4,7 +4,29 @@
     <title>Django Quest - Mapa</title>
 </head>
 <body>
-    <h1>Mapa</h1>
-    <p>Bem vindo ao Django Quest!</p>
+    <h1>Django Quest</h1>
+    <h2>Olá, {{ personagem.nome }}!</h2>
+    <p>Classe: {{ personagem.get_classe_display }}</p>
+    <p>Nível: {{ personagem.nivel }}</p>
+    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+    <p>Gold: {{ personagem.gold }}</p>
+
+    <h3>Escolha uma área:</h3>
+
+    <a href="{% url 'vila' 'floresta' %}">🌲 Floresta</a><br><br>
+
+    {% if personagem.area_desbloqueada == 'caverna' or personagem.area_desbloqueada == 'castelo' %}
+        <a href="{% url 'vila' 'caverna' %}">🪨 Caverna</a>
+    {% else %}
+        🪨 Caverna (bloqueada)
+    {% endif %}<br><br>
+
+    {% if personagem.area_desbloqueada == 'castelo' %}
+        <a href="{% url 'vila' 'castelo' %}">🏰 Castelo</a>
+    {% else %}
+        🏰 Castelo (bloqueado)
+    {% endif %}<br><br>
+
+    <a href="{% url 'logout' %}">Sair</a>
 </body>
 </html>

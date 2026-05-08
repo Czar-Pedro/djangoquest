@@ -61,4 +61,7 @@ def criar_personagem(request):
     return render(request, 'game/criar_personagem.html')
 
 def mapa(request):
-    return render(request, 'game/mapa.html')
+    personagem = Personagem.objects.filter(usuario=request.user).first()
+    if not personagem:
+        return redirect('criar_personagem')
+    return render(request, 'game/mapa.html', {'personagem': personagem})
