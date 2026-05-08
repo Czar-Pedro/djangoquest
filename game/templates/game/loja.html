@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Loja</title>
+    <style>
+        /* esconde todas as seções por padrão */
+        .secao { display: none; }
+        /* mostra a seção ativa */
+        .secao.ativa { display: block; }
+    </style>
+</head>
+<body>
+    <h1>Loja</h1>
+    <p>Gold: {{ personagem.gold }} 🪙</p>
+
+    <!-- botões de abas -->
+    <button onclick="mostrar('armas')">⚔️ Armas</button>
+    <button onclick="mostrar('armaduras')">🛡️ Armaduras</button>
+    <button onclick="mostrar('consumiveis')">🧪 Consumíveis</button>
+    <button onclick="mostrar('vender')">💰 Vender</button>
+
+    <!-- seção de armas -->
+    <div id="armas" class="secao">
+        <h2>Armas</h2>
+        {% for item in armas %}
+            <p>{{ item.nome }} — Ataque +{{ item.bonus_ataque }} — {{ item.preco }} 🪙
+                <a href="{% url 'comprar_item' item.id %}">Comprar</a>
+            </p>
+        {% endfor %}
+    </div>
+
+    <!-- seção de armaduras -->
+    <div id="armaduras" class="secao">
+        <h2>Armaduras</h2>
+        {% for item in armaduras %}
+            <p>{{ item.nome }} — Defesa +{{ item.bonus_defesa }} — {{ item.preco }} 🪙
+                <a href="{% url 'comprar_item' item.id %}">Comprar</a>
+            </p>
+        {% endfor %}
+    </div>
+
+    <!-- seção de consumíveis -->
+    <div id="consumiveis" class="secao">
+        <h2>Consumíveis</h2>
+        {% for item in consumiveis %}
+            <p>{{ item.nome }} — HP +{{ item.bonus_hp }} MP +{{ item.bonus_mp }} — {{ item.preco }} 🪙
+                <a href="{% url 'comprar_item' item.id %}">Comprar</a>
+            </p>
+        {% endfor %}
+    </div>
+
+    <!-- seção de vender -->
+    <div id="vender" class="secao">
+        <h2>Vender Itens</h2>
+        {% for inv in inventario %}
+            <p>{{ inv.item.nome }} x{{ inv.qtd }} — Vender por {{ inv.item.preco|divisibleby:2 }} 🪙
+                <a href="{% url 'vender_item' inv.item.id %}">Vender</a>
+            </p>
+        {% endfor %}
+    </div>
+
+    <!-- javascript para trocar as abas -->
+    <script>
+        function mostrar(secao) {
+            // esconde todas as seções
+            document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+            // mostra a seção clicada
+            document.getElementById(secao).classList.add('ativa');
+        }
+        // mostra armas por padrão ao abrir
+        mostrar('armas');
+    </script>
+
+    <br>
+    <a href="{% url 'vila' personagem.area_atual %}">Voltar à Vila</a>
+</body>
+</html>

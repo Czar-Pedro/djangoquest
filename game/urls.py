@@ -12,4 +12,7 @@ urlpatterns = [
     path('selecionar-personagem/', views.selecionar_personagem, name='selecionar_personagem'),
     path('entrar-personagem/<int:personagem_id>/', views.entrar_personagem, name='entrar_personagem'),
     path('mundo/', views.mundo, name='mundo'),
+    path('loja/', views.loja, name='loja'),
+    path('loja/comprar/<int:item_id>/', views.comprar_item, name='comprar_item'),
+    path('loja/vender/<int:item_id>/', views.vender_item, name='vender_item'),
 ]

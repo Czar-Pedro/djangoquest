@@ -5,10 +5,23 @@
 </head>
 <body>
     <h1>Vila - {{ area|title }}</h1>
+    
+    <!-- informações do personagem -->
     <p>Personagem: {{ personagem.nome }}</p>
     <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
-    <p>Gold: {{ personagem.gold }}</p>
+    <p>MP: {{ personagem.mp_atual }}/{{ personagem.mp_maximo }}</p>
+    <p>Gold: {{ personagem.gold }} 🪙</p>
+    <p>Batalhas nesta área: {{ personagem.batalhas_na_area }}/5</p>
 
-    <a href="{% url 'mapa' %}">Voltar ao Mapa</a>
+    <h3>O que deseja fazer?</h3>
+    
+    <!-- botão da loja -->
+    <a href="{% url 'loja' %}">🏪 Entrar na Loja</a><br><br>
+    
+    <!-- botão de explorar -->
+    <a href="#">⚔️ Explorar</a><br><br>
+    
+    <!-- botão de voltar ao mapa -->
+    <a href="{% url 'mapa' %}">🗺️ Voltar ao Mapa</a>
 </body>
 </html>

@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from .models import Personagem
+from .models import Personagem, Item, Inventario
 
 # página inicial — verifica se o usuário está logado e redireciona
 def index(request):
@@ -160,3 +160,84 @@ def mundo(request):
     # busca o personagem no banco
     personagem = Personagem.objects.get(id=personagem_id)
     return render(request, 'game/mundo.html', {'personagem': personagem})
+
+# página da loja — mostra itens para comprar e vender
+def loja(request):
+    # pega o id do personagem salvo na sessão
+    personagem_id = request.session.get('personagem_id')
+    # se não tiver personagem selecionado, manda selecionar
+    if not personagem_id:
+        return redirect('selecionar_personagem')
+    # busca o personagem no banco
+    personagem = Personagem.objects.get(id=personagem_id)
+    
+    # busca todos os itens separados por tipo
+    armas = Item.objects.filter(tipo='arma')
+    armaduras = Item.objects.filter(tipo='armadura')
+    consumiveis = Item.objects.filter(tipo='consumivel')
+    
+    # busca o inventário do personagem
+    inventario = Inventario.objects.filter(personagem=personagem)
+    
+    return render(request, 'game/loja.html', {
+        'personagem': personagem,
+        'armas': armas,
+        'armaduras': armaduras,
+        'consumiveis': consumiveis,
+        'inventario': inventario,
+    })
+
+
+# ação de comprar item
+def comprar_item(request, item_id):
+    # pega o personagem da sessão
+    personagem_id = request.session.get('personagem_id')
+    personagem = Personagem.objects.get(id=personagem_id)
+    # busca o item pelo id
+    item = Item.objects.get(id=item_id)
+    
+    # verifica se tem gold suficiente
+    if personagem.gold < item.preco:
+        return redirect('loja')
+    
+    # subtrai o gold do personagem
+    personagem.gold -= item.preco
+    personagem.save()
+    
+    # verifica se o item já está no inventário
+    inventario_item = Inventario.objects.filter(personagem=personagem, item=item).first()
+    if inventario_item:
+        # se já tiver, aumenta a quantidade
+        inventario_item.qtd += 1
+        inventario_item.save()
+    else:
+        # se não tiver, cria novo registro
+        Inventario.objects.create(personagem=personagem, item=item, qtd=1)
+    
+    return redirect('loja')
+
+
+# ação de vender item
+def vender_item(request, item_id):
+    # pega o personagem da sessão
+    personagem_id = request.session.get('personagem_id')
+    personagem = Personagem.objects.get(id=personagem_id)
+    # busca o item no inventário
+    item = Item.objects.get(id=item_id)
+    inventario_item = Inventario.objects.filter(personagem=personagem, item=item).first()
+    
+    # se tiver o item no inventário
+    if inventario_item:
+        # adiciona metade do preço ao gold (venda por metade do valor)
+        personagem.gold += item.preco // 2
+        personagem.save()
+        
+        # se tiver mais de 1, diminui a quantidade
+        if inventario_item.qtd > 1:
+            inventario_item.qtd -= 1
+            inventario_item.save()
+        else:
+            # se tiver só 1, remove do inventário
+            inventario_item.delete()
+    
+    return redirect('loja')
