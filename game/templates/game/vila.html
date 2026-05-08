@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Vila</title>
+</head>
+<body>
+    <h1>Vila - {{ area|title }}</h1>
+    <p>Personagem: {{ personagem.nome }}</p>
+    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+    <p>Gold: {{ personagem.gold }}</p>
+
+    <a href="{% url 'mapa' %}">Voltar ao Mapa</a>
+</body>
+</html>

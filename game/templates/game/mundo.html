@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Mapa Mundo</title>
+</head>
+<body>
+    <h1>Django Quest</h1>
+    <h2>Mapa Mundo</h2>
+    <p>Olá, {{ personagem.nome }}!</p>
+
+    <h3>Reinos disponíveis:</h3>
+    <a href="{% url 'mapa' %}">⚔️ Reino 1</a><br><br>
+
+    <a href="{% url 'selecionar_personagem' %}">Trocar personagem</a><br>
+    <a href="{% url 'logout' %}">Sair</a>
+</body>
+</html>

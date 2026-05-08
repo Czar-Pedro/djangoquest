@@ -11,4 +11,5 @@ urlpatterns = [
     path('vila/<str:area>/', views.vila, name='vila'),
     path('selecionar-personagem/', views.selecionar_personagem, name='selecionar_personagem'),
     path('entrar-personagem/<int:personagem_id>/', views.entrar_personagem, name='entrar_personagem'),
+    path('mundo/', views.mundo, name='mundo'),
 ]

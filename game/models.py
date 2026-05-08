@@ -31,6 +31,7 @@ class Personagem(models.Model):
     batalhas_na_area = models.IntegerField(default=0)
     fugas_restantes = models.IntegerField(default=2)
     area_desbloqueada = models.CharField(max_length=20, choices=AREAS, default='floresta')
+    gold_salvo = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.nome} - Nível {self.nivel}"
