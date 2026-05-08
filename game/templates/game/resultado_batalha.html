@@ -9,23 +9,34 @@
         <p>Você derrotou o {{ resultado.inimigo_nome }}!</p>
         <p>+{{ resultado.exp_ganho }} EXP</p>
         <p>+{{ resultado.gold_ganho }} 🪙</p>
+        <p>HP atual: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+        <p>Gold: {{ personagem.gold }} 🪙</p>
+        <br>
+        {% if personagem.batalhas_na_area < 5 %}
+            <a href="{% url 'iniciar_batalha' %}">⚔️ Próxima batalha</a><br><br>
+        {% endif %}
+        <a href="{% url 'vila' personagem.area_atual %}">🏠 Voltar à Vila</a>
+
     {% elif resultado.resultado == 'derrota' %}
         <h1>💀 Derrota!</h1>
         <p>Você foi derrotado pelo {{ resultado.inimigo_nome }}!</p>
         <p>Você perdeu todo o seu ouro!</p>
+        <p>HP atual: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+        <p>Gold: {{ personagem.gold }} 🪙</p>
+        <br>
+        <a href="{% url 'vila' personagem.area_atual %}">🏠 Voltar à Vila</a>
+
     {% elif resultado.resultado == 'fuga' %}
         <h1>🏃 Fuga!</h1>
         <p>Você fugiu da batalha!</p>
         <p>Perdeu 10% do seu ouro.</p>
+        <p>HP atual: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+        <p>Gold: {{ personagem.gold }} 🪙</p>
+        <br>
+        {% if personagem.batalhas_na_area < 5 %}
+            <a href="{% url 'iniciar_batalha' %}">⚔️ Continuar explorando</a><br><br>
+        {% endif %}
+        <a href="{% url 'vila' personagem.area_atual %}">🏠 Voltar à Vila</a>
     {% endif %}
-
-    <p>HP atual: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
-    <p>Gold: {{ personagem.gold }} 🪙</p>
-
-    <br>
-    {% if personagem.batalhas_na_area < 5 %}
-        <a href="{% url 'iniciar_batalha' %}">⚔️ Próxima batalha</a><br><br>
-    {% endif %}
-    <a href="{% url 'vila' personagem.area_atual %}">🏠 Voltar à Vila</a>
 </body>
 </html>
