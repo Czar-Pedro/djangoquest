@@ -9,6 +9,12 @@
         <p>Você derrotou o {{ resultado.inimigo_nome }}!</p>
         <p>+{{ resultado.exp_ganho }} EXP</p>
         <p>+{{ resultado.gold_ganho }} 🪙</p>
+        {% if resultado.subiu_nivel %}
+    <p>⬆️ LEVEL UP! Você chegou ao nível {{ resultado.nivel_atual }}!</p>
+        {% endif %}
+{% if resultado.area_desbloqueada %}
+    <p>🗺️ Nova área desbloqueada: {{ resultado.proxima_area|title }}!</p>
+{% endif %}
         <p>HP atual: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
         <p>Gold: {{ personagem.gold }} 🪙</p>
         <br>

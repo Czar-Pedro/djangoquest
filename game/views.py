@@ -243,7 +243,38 @@ def vender_item(request, item_id):
     return redirect('loja')
 import random
 
-
+# verifica e aplica o level up do personagem
+def verificar_level_up(personagem):
+    # xp necessário para cada nível
+    xp_necessario = personagem.nivel * 100 + (personagem.nivel - 1) * 50
+    
+    # verifica se tem xp suficiente
+    if personagem.experiencia >= xp_necessario:
+        # sobe de nível
+        personagem.nivel += 1
+        
+        # ganhos por classe ao subir de nível
+        GANHOS = {
+            'guerreiro': {'hp': 20, 'mp': 5,  'ataque': 3, 'defesa': 3},
+            'mago':      {'hp': 10, 'mp': 20, 'ataque': 2, 'defesa': 1},
+            'ladrao':    {'hp': 15, 'mp': 8,  'ataque': 3, 'defesa': 2},
+            'arqueiro':  {'hp': 15, 'mp': 8,  'ataque': 3, 'defesa': 2},
+        }
+        
+        ganhos = GANHOS[personagem.classe]
+        
+        # aplica os ganhos
+        personagem.hp_maximo += ganhos['hp']
+        personagem.hp_atual += ganhos['hp']  # cura ao subir de nível
+        personagem.mp_maximo += ganhos['mp']
+        personagem.mp_atual += ganhos['mp']
+        personagem.ataque += ganhos['ataque']
+        personagem.defesa += ganhos['defesa']
+        personagem.save()
+        
+        # retorna True para avisar que subiu de nível
+        return True
+    return False
 # inicia uma nova batalha sorteando um inimigo da área
 def iniciar_batalha(request):
     # pega o personagem da sessão
@@ -329,6 +360,11 @@ def acao_batalha(request):
                 b.resultado = 'fuga'
                 b.save()
 
+                # salva o resultado na sessão para exibir na tela de resultado
+                request.session['resultado'] = {
+                    'resultado': 'fuga',
+                    'inimigo_nome': inimigo.nome,
+                }
                 return redirect('resultado_batalha')
             else:
                 personagem.fugas_restantes -= 1
@@ -346,26 +382,46 @@ def acao_batalha(request):
         # reseta o estado de defesa
     batalha['defendendo'] = False
     
-    # --- VERIFICA SE O INIMIGO MORREU ---
+   # --- VERIFICA SE O INIMIGO MORREU ---
     if inimigo_hp <= 0:
-        # adiciona experiência e gold ao personagem
         personagem.experiencia += inimigo.experiencia
         personagem.gold += inimigo.gold
         personagem.batalhas_na_area += 1
         personagem.save()
-        # vitória
+        
+        # verifica level up
+        subiu_nivel = verificar_level_up(personagem)
+        
+        # verifica se venceu o boss e desbloqueia próxima área
+        area_desbloqueada = False
+        if inimigo.is_boss:
+            PROXIMA_AREA = {
+                'floresta': 'caverna',
+                'caverna': 'castelo',
+                'castelo': None,  # última área
+            }
+            proxima = PROXIMA_AREA.get(personagem.area_atual)
+            if proxima and personagem.area_desbloqueada == personagem.area_atual:
+                # desbloqueia a próxima área
+                personagem.area_desbloqueada = proxima
+                personagem.save()
+                area_desbloqueada = True
+        
         b = Batalha()
         b.personagem = personagem
         b.inimigo = inimigo
         b.resultado = 'vitoria'
         b.save()
-
-        # salva resultado na sessão
+        
         request.session['resultado'] = {
             'resultado': 'vitoria',
             'inimigo_nome': inimigo.nome,
             'exp_ganho': inimigo.experiencia,
             'gold_ganho': inimigo.gold,
+            'subiu_nivel': subiu_nivel,
+            'nivel_atual': personagem.nivel,
+            'area_desbloqueada': area_desbloqueada,
+            'proxima_area': proxima if inimigo.is_boss else None,
         }
         return redirect('resultado_batalha')
     
@@ -385,6 +441,7 @@ def acao_batalha(request):
             'resultado': 'derrota',
             'inimigo_nome': inimigo.nome,
         }
+        
         return redirect('resultado_batalha')
     
     # atualiza o estado da batalha na sessão
