@@ -7,15 +7,14 @@ AREAS = [
         ('caverna', 'Caverna'),
         ('castelo', 'Castelo'),
     ]
-
-class Personagem(models.Model):
-    CLASSES = [
+CLASSES = [
         ('guerreiro', 'Guerreiro'),
         ('mago', 'Mago'),
         ('ladrao', 'Ladrão'),
         ('arqueiro', 'Arqueiro'),
     ]
-
+class Personagem(models.Model):
+    
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     nome = models.CharField(max_length=100)
     classe = models.CharField(max_length=20, choices=CLASSES)
@@ -69,6 +68,11 @@ class Item(models.Model):
     bonus_defesa = models.IntegerField(default=0)
     bonus_hp = models.IntegerField(default=0)
     bonus_mp = models.IntegerField(default=0)
+    classes_permitidas = models.CharField(
+    max_length=100,
+    default='guerreiro,mago,ladrao,arqueiro',
+    help_text='Separe as classes por vírgula: guerreiro,mago,ladrao,arqueiro'
+    )
 
     def __str__(self):
         return f"{self.nome} ({self.get_tipo_display()})"

@@ -170,11 +170,10 @@ def loja(request):
         return redirect('selecionar_personagem')
     # busca o personagem no banco
     personagem = Personagem.objects.get(id=personagem_id)
-    
-    # busca todos os itens separados por tipo
-    armas = Item.objects.filter(tipo='arma')
-    armaduras = Item.objects.filter(tipo='armadura')
-    consumiveis = Item.objects.filter(tipo='consumivel')
+    # busca itens disponíveis para a classe do personagem
+    armas = Item.objects.filter(tipo='arma', classes_permitidas__contains=personagem.classe)
+    armaduras = Item.objects.filter(tipo='armadura', classes_permitidas__contains=personagem.classe)
+    consumiveis = Item.objects.filter(tipo='consumivel', classes_permitidas__contains=personagem.classe)
     
     # busca o inventário do personagem
     inventario = Inventario.objects.filter(personagem=personagem)
