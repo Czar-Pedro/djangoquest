@@ -1,19 +1,209 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Django Quest - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("{% static 'game/login_bg.png' %}");
+    background-size: cover;
+    background-position: 10% 25%;
+    filter: brightness(1.6);
+    z-index: -1;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
+}
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title h1 {
+            font-size: 20px;
+            color: #c8e6c0;
+            text-shadow: 0 0 10px #2d6a3f, 0 2px 0 #000;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .title p {
+            font-size: 7px;
+            color: #6aad72;
+            letter-spacing: 1px;
+        }
+
+        .panel {
+            background: rgba(8, 20, 10, 0.88);
+            border: 3px solid #1e3d24;
+            box-shadow: 4px 4px 0 #000, 0 0 24px rgba(13, 42, 26, 0.8);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid #1a3020;
+            pointer-events: none;
+        }
+
+        .panel-title {
+            font-size: 10px;
+            color: #6aad72;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .field {
+            margin-bottom: 1.25rem;
+        }
+
+        .field label {
+            display: block;
+            font-size: 7px;
+            color: #4a7a52;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .field input {
+            width: 100%;
+            background: #060d08;
+            border: 2px solid #1e3d24;
+            color: #a8d8b0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            padding: 0.75rem;
+            outline: none;
+            box-shadow: inset 2px 2px 0 #000;
+        }
+
+        .field input:focus {
+            border-color: #3d8a4a;
+            box-shadow: inset 2px 2px 0 #000, 0 0 6px #1a4a22;
+        }
+
+        .btn {
+            width: 100%;
+            background: #1a3d22;
+            border: 2px solid #3d8a4a;
+            color: #a8d8b0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            padding: 0.875rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+            box-shadow: 3px 3px 0 #000;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: #245230;
+            color: #c8e6c0;
+            box-shadow: 1px 1px 0 #000;
+            transform: translate(2px, 2px);
+        }
+
+        .btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
+
+        .register {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 7px;
+            color: #4a7a52;
+            letter-spacing: 1px;
+        }
+
+        .register a {
+            color: #6aad72;
+            text-decoration: none;
+        }
+
+        .register a:hover {
+            color: #a8d8b0;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #1a3020;
+            margin: 1.25rem 0;
+        }
+
+        {% if erro %}
+        .erro {
+            font-size: 7px;
+            color: #e05555;
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+        {% endif %}
+    </style>
 </head>
 <body>
-    <h1>Django Quest</h1>
-    <h2>Login</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <label>Usuário:</label>
-        <input type="text" name="usuario"><br><br>
-        <label>Senha:</label>
-        <input type="password" name="senha"><br><br>
-        <button type="submit">Entrar</button>
-    </form>
-    <p>Não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se</a></p>
+    <div class="container">
+        <div class="title">
+            <h1>CORRUPÇÃO</h1>
+            <p>► uma aventura começa aqui ◄</p>
+        </div>
+        <div class="panel">
+            <div class="panel-title">▸ ENTRAR ◂</div>
+            {% if erro %}
+                <p class="erro">{{ erro }}</p>
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="field">
+                    <label>USUÁRIO</label>
+                    <input type="text" name="usuario" placeholder="nome de usuario">
+                </div>
+                <div class="field">
+                    <label>SENHA</label>
+                    <input type="password" name="senha" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn">▶ ENTRAR</button>
+            </form>
+            <hr class="divider">
+            <div class="register">
+                não tem conta? <a href="{% url 'cadastro' %}">cadastre-se</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
