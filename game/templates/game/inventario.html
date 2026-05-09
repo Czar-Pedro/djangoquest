@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Quest - Inventário</title>
+    <style>
+        .secao { display: none; }
+        .secao.ativa { display: block; }
+    </style>
+</head>
+<body>
+    <h1>🎒 Inventário</h1>
+
+    <!-- status do personagem -->
+    <p>{{ personagem.nome }} — Nível {{ personagem.nivel }}</p>
+    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
+    <p>Ataque: {{ ataque_real }} {% if personagem.arma_equipada %}(+{{ personagem.arma_equipada.bonus_ataque }} {{ personagem.arma_equipada.nome }}){% endif %}</p>
+    <p>Defesa: {{ defesa_real }} {% if personagem.armadura_equipada %}(+{{ personagem.armadura_equipada.bonus_defesa }} {{ personagem.armadura_equipada.nome }}){% endif %}</p>
+    <p>Gold: {{ personagem.gold }} 🪙</p>
+
+    <hr>
+
+    <!-- abas do inventário -->
+    <button onclick="mostrar('armas')">⚔️ Armas</button>
+    <button onclick="mostrar('armaduras')">🛡️ Armaduras</button>
+    <button onclick="mostrar('consumiveis')">🧪 Consumíveis</button>
+
+    <!-- seção de armas -->
+    <div id="armas" class="secao">
+        <h2>Armas</h2>
+        {% for inv in armas %}
+            <p>
+                {{ inv.item.nome }} x{{ inv.qtd }} — Ataque +{{ inv.item.bonus_ataque }}
+                {% if personagem.arma_equipada == inv.item %}
+                    ✅ Equipada
+                    <a href="{% url 'equipar_item' inv.item.id %}">Desequipar</a>
+                {% else %}
+                    <a href="{% url 'equipar_item' inv.item.id %}">Equipar</a>
+                {% endif %}
+            </p>
+        {% empty %}
+            <p>Nenhuma arma no inventário.</p>
+        {% endfor %}
+    </div>
+
+    <!-- seção de armaduras -->
+    <div id="armaduras" class="secao">
+        <h2>Armaduras</h2>
+        {% for inv in armaduras %}
+            <p>
+                {{ inv.item.nome }} x{{ inv.qtd }} — Defesa +{{ inv.item.bonus_defesa }}
+                {% if personagem.armadura_equipada == inv.item %}
+                    ✅ Equipada
+                    <a href="{% url 'equipar_item' inv.item.id %}">Desequipar</a>
+                {% else %}
+                    <a href="{% url 'equipar_item' inv.item.id %}">Equipar</a>
+                {% endif %}
+            </p>
+        {% empty %}
+            <p>Nenhuma armadura no inventário.</p>
+        {% endfor %}
+    </div>
+
+    <!-- seção de consumíveis -->
+    <div id="consumiveis" class="secao">
+        <h2>Consumíveis</h2>
+        {% for inv in consumiveis %}
+            <p>{{ inv.item.nome }} x{{ inv.qtd }} — HP +{{ inv.item.bonus_hp }} MP +{{ inv.item.bonus_mp }}</p>
+        {% empty %}
+            <p>Nenhum consumível no inventário.</p>
+        {% endfor %}
+    </div>
+
+    <br>
+    <button onclick="history.back()">🔙 Voltar</button>
+    <a href="{% url 'mundo' %}">🗺️ Mapa Mundo</a>
+
+    <script>
+        function mostrar(secao) {
+            document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+            document.getElementById(secao).classList.add('ativa');
+        }
+        // mostra armas por padrão
+        mostrar('armas');
+    </script>
+</body>
+</html>

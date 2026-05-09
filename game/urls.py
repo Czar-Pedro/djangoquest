@@ -19,4 +19,6 @@ urlpatterns = [
     path('batalha/acao/', views.acao_batalha, name='acao_batalha'),
     path('batalha/resultado/', views.resultado_batalha, name='resultado_batalha'),
     path('batalha/item/<int:item_id>/', views.usar_item_batalha, name='usar_item_batalha'),
+    path('inventario/', views.inventario, name='inventario'),
+    path('inventario/equipar/<int:item_id>/', views.equipar_item, name='equipar_item'),
 ]

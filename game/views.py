@@ -329,8 +329,9 @@ def acao_batalha(request):
     
     # --- AÇÃO: ATACAR ---
     if acao == 'atacar':
-        # calcula dano do personagem ao inimigo
-        dano = max(1, personagem.ataque - inimigo.defesa)
+        # calcula ataque real somando bônus da arma equipada
+        ataque_real = personagem.ataque + (personagem.arma_equipada.bonus_ataque if personagem.arma_equipada else 0)
+        dano = max(1, ataque_real - inimigo.defesa)
         inimigo_hp -= dano
         mensagem = f'Você causou {dano} de dano ao {inimigo.nome}!'
     
@@ -373,13 +374,14 @@ def acao_batalha(request):
     
     # --- INIMIGO ATACA ---
     if inimigo_hp > 0:
-        # calcula defesa atual (30% a mais se defendendo)
-        defesa_atual = int(personagem.defesa * 1.3) if batalha['defendendo'] else personagem.defesa
+        # calcula defesa real somando bônus da armadura equipada
+        defesa_base = personagem.defesa + (personagem.armadura_equipada.bonus_defesa if personagem.armadura_equipada else 0)
+        # aplica bônus de 30% se estiver defendendo
+        defesa_atual = int(defesa_base * 1.3) if batalha['defendendo'] else defesa_base
         # calcula dano do inimigo ao personagem
         dano_inimigo = max(1, inimigo.ataque - defesa_atual)
         personagem.hp_atual -= dano_inimigo
         mensagem += f' {inimigo.nome} causou {dano_inimigo} de dano em você!'
-        # reseta o estado de defesa
     batalha['defendendo'] = False
     
    # --- VERIFICA SE O INIMIGO MORREU ---
@@ -500,7 +502,9 @@ def usar_item_batalha(request, item_id):
     
     # inimigo ataca em resposta ao turno gasto
     if inimigo_hp > 0:
-        dano_inimigo = max(1, inimigo.ataque - personagem.defesa)
+        # calcula defesa real somando bônus da armadura equipada
+        defesa_real = personagem.defesa + (personagem.armadura_equipada.bonus_defesa if personagem.armadura_equipada else 0)
+        dano_inimigo = max(1, inimigo.ataque - defesa_real)
         personagem.hp_atual -= dano_inimigo
         mensagem += f' {inimigo.nome} causou {dano_inimigo} de dano em você!'
     
@@ -549,3 +553,60 @@ def resultado_batalha(request):
         'personagem': personagem,
         'resultado': resultado,
     })
+
+# página de inventário do personagem — mostra itens e equipamentos atuais
+def inventario(request):
+    personagem_id = request.session.get('personagem_id')
+    if not personagem_id:
+        return redirect('selecionar_personagem')
+    personagem = Personagem.objects.get(id=personagem_id)
+    
+    # busca todos os itens do inventário separados por tipo
+    armas = Inventario.objects.filter(personagem=personagem, item__tipo='arma')
+    armaduras = Inventario.objects.filter(personagem=personagem, item__tipo='armadura')
+    consumiveis = Inventario.objects.filter(personagem=personagem, item__tipo='consumivel')
+    
+    # calcula ataque e defesa reais com equipamentos
+    ataque_real = personagem.ataque + (personagem.arma_equipada.bonus_ataque if personagem.arma_equipada else 0)
+    defesa_real = personagem.defesa + (personagem.armadura_equipada.bonus_defesa if personagem.armadura_equipada else 0)
+    
+    return render(request, 'game/inventario.html', {
+        'personagem': personagem,
+        'armas': armas,
+        'armaduras': armaduras,
+        'consumiveis': consumiveis,
+        'ataque_real': ataque_real,
+        'defesa_real': defesa_real,
+    })
+
+
+# equipa ou desequipa um item
+def equipar_item(request, item_id):
+    personagem_id = request.session.get('personagem_id')
+    personagem = Personagem.objects.get(id=personagem_id)
+    item = Item.objects.get(id=item_id)
+    
+    # verifica se o item está no inventário do personagem
+    if not Inventario.objects.filter(personagem=personagem, item=item).exists():
+        return redirect('inventario')
+    
+    # equipa ou desequipa arma
+    if item.tipo == 'arma':
+        if personagem.arma_equipada == item:
+            # desequipa se já estava equipada
+            personagem.arma_equipada = None
+        else:
+            # equipa a nova arma
+            personagem.arma_equipada = item
+    
+    # equipa ou desequipa armadura
+    elif item.tipo == 'armadura':
+        if personagem.armadura_equipada == item:
+            # desequipa se já estava equipada
+            personagem.armadura_equipada = None
+        else:
+            # equipa a nova armadura
+            personagem.armadura_equipada = item
+    
+    personagem.save()
+    return redirect('inventario')

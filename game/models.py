@@ -33,6 +33,9 @@ class Personagem(models.Model):
     fugas_restantes = models.IntegerField(default=2)
     area_desbloqueada = models.CharField(max_length=20, choices=AREAS, default='floresta')
     gold_salvo = models.IntegerField(default=0)
+    arma_equipada = models.ForeignKey('Item', on_delete=models.SET_NULL, null=True, blank=True, related_name='arma_equipada')
+    armadura_equipada = models.ForeignKey('Item', on_delete=models.SET_NULL, null=True, blank=True, related_name='armadura_equipada')
+
 
     def __str__(self):
         return f"{self.nome} - Nível {self.nivel}"
