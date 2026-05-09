@@ -1,23 +1,311 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Django Quest - Criar Personagem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ============================
+           RESET & VARIÁVEIS GLOBAIS
+        ============================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Cores */
+            --cor-pergaminho-titulo:  #3a2000;
+            --cor-pergaminho-label:   #5a3500;
+            --cor-pergaminho-borda:   #8a6020;
+            --cor-pergaminho-borda-focus: #5a3500;
+            --cor-pergaminho-input-bg: rgba(255, 220, 150, 0.3);
+            --cor-pergaminho-input-bg-focus: rgba(255, 220, 150, 0.5);
+            --cor-btn-bg:             #5a3500;
+            --cor-btn-bg-hover:       #7a4a00;
+            --cor-btn-texto:          #f5d080;
+            --cor-btn-sombra:         #2a1500;
+
+            --cor-classe-titulo:      #c8e6c0;
+            --cor-classe-titulo-glow: #2d6a3f;
+            --cor-classe-borda:       #1e3d24;
+            --cor-classe-borda-sel:   #6aad72;
+            --cor-classe-glow-sel:    #2d6a3f;
+            --cor-classe-label:       #4a7a52;
+            --cor-classe-label-sel:   #a8d8b0;
+
+            /* Tipografia — clamp(min, preferred, max) */
+            --font-titulo:    clamp(0.5rem, 1vw, 1rem);
+            --font-label:     clamp(0.4rem, 0.7vw, 0.75rem);
+            --font-input:     clamp(0.5rem, 1vw, 0.9rem);
+            --font-btn:       clamp(0.4rem, 0.7vw, 0.7rem);
+            --font-h2-classe: clamp(0.5rem, 1vw, 0.9rem);
+            --font-span-card: clamp(0.4rem, 0.65vw, 0.65rem);
+
+            /* Espaçamentos base */
+            --gap-form:    0.75rem;
+            --gap-grade:   1rem;
+            --gap-cards:   0.4rem;
+            --pad-input:   0.5rem;
+            --pad-btn:     0.65rem;
+
+            /* Bordas (px é aceitável para bordas finas — < 3px) */
+            --borda-input: 2px solid var(--cor-pergaminho-borda);
+            --borda-card:  3px solid var(--cor-classe-borda);
+        }
+
+        /* ============================
+           FUNDO
+        ============================ */
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Imagem de fundo */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("{% static 'game/login_bg.png' %}");
+            background-size: cover;
+            background-position: 65% 55%;
+            filter: brightness(1.6);
+            z-index: -1;
+        }
+
+        /* Overlay escuro */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 0;
+        }
+
+        /* ============================
+           LAYOUT PRINCIPAL
+        ============================ */
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4vw;
+            padding: 2vh 2vw;
+            width: 100%;
+        }
+
+        /* ============================
+           PERGAMINHO
+        ============================ */
+        .pergaminho-wrapper {
+            position: relative;
+            width: 50vw;
+            flex-shrink: 0;
+            margin-top: -20vh; /* afasta do centro vertical para alinhar visualmente com os cards */
+        }
+
+        .pergaminho-wrapper img.scroll {
+            width: 100%;
+            height: 150vh;       /* altura natural da imagem — sem valor fixo em vh */
+            display: block;
+        }
+
+        .pergaminho-conteudo {
+            position: absolute;
+            top: -15%;           /* posição relativa à altura real da imagem */
+            left: 26%;
+            right: 26%;
+            bottom: 18%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--gap-form);
+        }
+
+        .pergaminho-conteudo h2 {
+            font-size: var(--font-titulo);
+            color: var(--cor-pergaminho-titulo);
+            letter-spacing: 0.05em;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .pergaminho-conteudo label {
+            font-size: var(--font-label);
+            color: var(--cor-pergaminho-label);
+            letter-spacing: 0.05em;
+            align-self: flex-start;
+        }
+
+        .pergaminho-conteudo input {
+            width: 100%;
+            background: var(--cor-pergaminho-input-bg);
+            border: var(--borda-input);
+            color: var(--cor-pergaminho-titulo);
+            font-family: 'Press Start 2P', monospace;
+            font-size: var(--font-input);
+            padding: var(--pad-input);
+            outline: none;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .pergaminho-conteudo input:focus {
+            border-color: var(--cor-pergaminho-borda-focus);
+            background: var(--cor-pergaminho-input-bg-focus);
+        }
+
+        .btn-criar {
+            width: 100%;
+            background: var(--cor-btn-bg);
+            border: 2px solid var(--cor-pergaminho-borda);
+            color: var(--cor-btn-texto);
+            font-family: 'Press Start 2P', monospace;
+            font-size: var(--font-btn);
+            padding: var(--pad-btn);
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            box-shadow: 0.125rem 0.125rem 0 var(--cor-btn-sombra);
+            transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-criar:hover {
+            background: var(--cor-btn-bg-hover);
+            box-shadow: 0.0625rem 0.0625rem 0 var(--cor-btn-sombra);
+            transform: translate(0.0625rem, 0.0625rem);
+        }
+
+        /* ============================
+           GRADE DE CLASSES
+        ============================ */
+        .classes-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            align-self: flex-start;  /* ← gruda no topo do container */
+            margin-top: 5vh;         /* ← aí ajusta a distância do topo com isso */
+        }
+
+        .classes-wrapper h2 {
+            font-size: var(--font-h2-classe);
+            color: var(--cor-classe-titulo);
+            text-shadow: 0 0 0.5rem var(--cor-classe-titulo-glow);
+            letter-spacing: 0.1em;
+        }
+
+        .classes-grade {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--gap-grade);
+        }
+
+        .classe-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-cards);
+            cursor: pointer;
+        }
+
+        .classe-card img {
+            width: 19vw;          /* aumentado de 15vw → 19vw */
+            height: 19vw;
+            object-fit: cover;
+            border: var(--borda-card);
+            filter: grayscale(100%) brightness(0.5);
+            transition: filter 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .classe-card.selecionada img {
+            filter: grayscale(0%) brightness(1);
+            border-color: var(--cor-classe-borda-sel);
+            box-shadow: 0 0 0.75rem var(--cor-classe-glow-sel);
+        }
+
+        .classe-card span {
+            font-size: var(--font-span-card);
+            color: var(--cor-classe-label);
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        .classe-card.selecionada span {
+            color: var(--cor-classe-label-sel);
+        }
+
+        #classe-input { display: none; }
+    </style>
 </head>
 <body>
-    <h1>Django Quest</h1>
-    <h2>Crie seu Personagem</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <label>Nome do Personagem:</label>
-        <input type="text" name="nome"><br><br>
-        <label>Escolha sua Classe:</label>
-        <select name="classe">
-            <option value="guerreiro">Guerreiro</option>
-            <option value="mago">Mago</option>
-            <option value="ladrao">Ladrão</option>
-            <option value="arqueiro">Arqueiro</option>
-        </select><br><br>
-        <button type="submit">Criar Personagem</button>
-    </form>
+    <div class="container">
+
+        <form method="POST" id="form-criar">
+            {% csrf_token %}
+            <input type="hidden" name="classe" id="classe-input">
+
+            <div class="pergaminho-wrapper">
+                <img src="{% static 'game/pergaminho.png' %}" class="scroll" alt="pergaminho">
+                <div class="pergaminho-conteudo">
+                    <h2>▸ NOVO HERÓI ◂</h2>
+                    <label>NOME</label>
+                    <input type="text" name="nome" placeholder="seu nome..." required>
+                    <button type="submit" class="btn-criar">▶ CRIAR</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="classes-wrapper">
+            <h2>ESCOLHA SUA CLASSE</h2>
+            <div class="classes-grade">
+
+                <div class="classe-card" onclick="selecionarClasse(this, 'guerreiro')">
+                    <img src="{% static 'game/guerreiro.jpeg' %}" alt="Guerreiro">
+                    <span>GUERREIRO</span>
+                </div>
+
+                <div class="classe-card" onclick="selecionarClasse(this, 'ladrao')">
+                    <img src="{% static 'game/ladrao.jpeg' %}" alt="Ladrão">
+                    <span>LADRÃO</span>
+                </div>
+
+                <div class="classe-card" onclick="selecionarClasse(this, 'mago')">
+                    <img src="{% static 'game/mago.jpeg' %}" alt="Mago">
+                    <span>MAGO</span>
+                </div>
+
+                <div class="classe-card" onclick="selecionarClasse(this, 'arqueiro')">
+                    <img src="{% static 'game/arqueiro.jpeg' %}" alt="Arqueiro">
+                    <span>ARQUEIRO</span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function selecionarClasse(card, classe) {
+            document.querySelectorAll('.classe-card').forEach(c => c.classList.remove('selecionada'));
+            card.classList.add('selecionada');
+            document.getElementById('classe-input').value = classe;
+        }
+
+        document.getElementById('form-criar').addEventListener('submit', function(e) {
+            if (!document.getElementById('classe-input').value) {
+                e.preventDefault();
+                alert('Escolha uma classe antes de continuar!');
+            }
+        });
+    </script>
 </body>
 </html>

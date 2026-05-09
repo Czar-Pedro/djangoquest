@@ -1,48 +1,60 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <title>Django Quest - Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-    font-family: 'Press Start 2P', monospace;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("{% static 'game/login_bg.png' %}");
-    background-size: cover;
-    background-position: 10% 25%;
-    filter: brightness(1.6);
-    z-index: -1;
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: 0;
-}
-
-        .container {
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 420px;
-            padding: 2rem;
+            overflow: hidden;
         }
 
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("{% static 'game/login_bg.png' %}");
+            background-size: cover;
+            background-position: 10% 25%;
+            filter: brightness(1.6);
+            z-index: -1;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 0;
+        }
+
+        /* ═══════════════════════════════════════════════
+           SCALE ENGINE
+           O wrapper é desenhado em tamanho fixo (px),
+           igual ao design original. O JS escala tudo
+           proporcionalmente para qualquer resolução.
+        ═══════════════════════════════════════════════ */
+        .viewport-scale {
+            position: relative;
+            z-index: 1;
+
+            /* Dimensões de design — tamanho natural do conteúdo */
+            width: 420px;
+            height: auto;
+
+            transform-origin: center center;
+            transform: scale(var(--scale, 1));
+        }
+
+        /* ── Título ─────────────────────────────────── */
         .title {
             text-align: center;
             margin-bottom: 2rem;
@@ -62,6 +74,7 @@ body::before {
             letter-spacing: 1px;
         }
 
+        /* ── Painel ─────────────────────────────────── */
         .panel {
             background: rgba(8, 20, 10, 0.88);
             border: 3px solid #1e3d24;
@@ -86,6 +99,7 @@ body::before {
             letter-spacing: 2px;
         }
 
+        /* ── Campos ─────────────────────────────────── */
         .field {
             margin-bottom: 1.25rem;
         }
@@ -115,6 +129,7 @@ body::before {
             box-shadow: inset 2px 2px 0 #000, 0 0 6px #1a4a22;
         }
 
+        /* ── Botão ──────────────────────────────────── */
         .btn {
             width: 100%;
             background: #1a3d22;
@@ -142,6 +157,7 @@ body::before {
             box-shadow: none;
         }
 
+        /* ── Rodapé ─────────────────────────────────── */
         .register {
             text-align: center;
             margin-top: 1.25rem;
@@ -155,9 +171,7 @@ body::before {
             text-decoration: none;
         }
 
-        .register a:hover {
-            color: #a8d8b0;
-        }
+        .register a:hover { color: #a8d8b0; }
 
         .divider {
             border: none;
@@ -165,7 +179,6 @@ body::before {
             margin: 1.25rem 0;
         }
 
-        {% if erro %}
         .erro {
             font-size: 7px;
             color: #e05555;
@@ -173,37 +186,78 @@ body::before {
             margin-bottom: 1rem;
             letter-spacing: 1px;
         }
-        {% endif %}
+
+        /* ── Fallback mobile portrait ────────────────── */
+        @media (max-width: 500px) {
+            .viewport-scale {
+                width: 90vw;
+                transform: none !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="viewport-scale" id="vp">
         <div class="title">
             <h1>CORRUPÇÃO</h1>
             <p>► uma aventura começa aqui ◄</p>
         </div>
+
         <div class="panel">
             <div class="panel-title">▸ ENTRAR ◂</div>
+
             {% if erro %}
                 <p class="erro">{{ erro }}</p>
             {% endif %}
+
             <form method="POST">
                 {% csrf_token %}
                 <div class="field">
                     <label>USUÁRIO</label>
-                    <input type="text" name="usuario" placeholder="nome de usuario">
+                    <input type="text" name="usuario" placeholder="nome de usuario" autocomplete="username">
                 </div>
                 <div class="field">
                     <label>SENHA</label>
-                    <input type="password" name="senha" placeholder="••••••••">
+                    <input type="password" name="senha" placeholder="••••••••" autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn">▶ ENTRAR</button>
             </form>
+
             <hr class="divider">
+
             <div class="register">
                 não tem conta? <a href="{% url 'cadastro' %}">cadastre-se</a>
             </div>
         </div>
     </div>
+
+    <script>
+        // ── Scale Engine ────────────────────────────────────────────
+        // Mesmo mecanismo da tela de criar personagem:
+        // escala o conteúdo desenhado em px para caber em qualquer tela.
+        //
+        // DESIGN_W: largura natural do painel (420px, igual ao max-width original)
+        // DESIGN_H: altura estimada do conteúdo (~420px para o painel de login)
+        //
+        // Math.min(scaleX, scaleY) garante que nenhum eixo ultrapassa a viewport.
+
+        const DESIGN_W = 420;
+        const DESIGN_H = 420;   // estimativa conservadora da altura total
+        const vp = document.getElementById('vp');
+
+        function applyScale() {
+            if (window.innerWidth <= 500) return;   // mobile: CSS cuida
+
+            const scaleX = window.innerWidth  / (DESIGN_W * 2.2);  // margem lateral generosa
+            const scaleY = window.innerHeight / (DESIGN_H * 1.4);  // margem vertical
+            const scale  = Math.min(scaleX, scaleY, 2.5);          // teto: nunca passa de 2.5×
+
+            vp.style.setProperty('--scale', scale);
+        }
+
+        applyScale();
+        window.addEventListener('resize', applyScale);
+    </script>
 </body>
 </html>
