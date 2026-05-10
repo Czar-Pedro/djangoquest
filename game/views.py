@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from .models import Personagem, Item, Inventario, Batalha, Inimigo
+from django.shortcuts import get_object_or_404
+
 
 # página inicial — verifica se o usuário está logado e redireciona
 def index(request):
@@ -70,7 +72,7 @@ def logout_view(request):
 
 # página de criação de personagem
 def criar_personagem(request):
- # se o formulário foi enviado
+    # se o formulário foi enviado
     if request.method == 'POST':
         # pega os dados do formulário
         nome = request.POST['nome']
@@ -84,8 +86,9 @@ def criar_personagem(request):
         }
         # pega os atributos da classe escolhida
         atributos = ATRIBUTOS[classe]
-        # cria o personagem no banco com os atributos da classe
-        Personagem.objects.create(
+        # cria o personagem no banco e guarda o objeto retornado
+        # (antes era só Personagem.objects.create(...) sem salvar o retorno)
+        personagem = Personagem.objects.create(
             usuario=request.user,     # vincula ao usuário logado
             nome=nome,                # nome escolhido
             classe=classe,            # classe escolhida
@@ -96,7 +99,12 @@ def criar_personagem(request):
             ataque=atributos['ataque'],
             defesa=atributos['defesa'],
         )
-        # redireciona para o mapa após criar
+        # salva o id do novo personagem na sessão imediatamente
+        # força int para evitar conflito de tipo entre string e int na sessão
+        request.session['personagem_id'] = int(personagem.id)
+        # marca a sessão como modificada para garantir que o Django salve
+        request.session.modified = True
+        # redireciona para o mundo já com o novo personagem ativo
         return redirect('mundo')
     # se não foi enviado, mostra o formulário vazio
     return render(request, 'game/criar_personagem.html')
@@ -111,8 +119,13 @@ def selecionar_personagem(request):
 
 # página que registra qual personagem foi escolhido
 def entrar_personagem(request, personagem_id):
+    # busca o personagem garantindo que pertence ao usuário logado
     personagem = Personagem.objects.get(id=personagem_id, usuario=request.user)
-    request.session['personagem_id'] = personagem_id
+    # força int para evitar conflito de tipo na sessão
+    # (a URL entrega string, mas a sessão pode comparar com int — causando bug)
+    request.session['personagem_id'] = int(personagem_id)
+    # marca a sessão como modificada para garantir que o Django salve
+    request.session.modified = True
     # redireciona para o mapa mundo após selecionar personagem
     return redirect('mundo')
 
@@ -609,3 +622,21 @@ def equipar_item(request, item_id):
     
     personagem.save()
     return redirect('inventario')
+
+# deleta um personagem do usuário logado
+def deletar_personagem(request, personagem_id):
+    # só executa se a requisição for POST — evita deleção acidental via link (GET)
+    if request.method == 'POST':
+        # busca o personagem garantindo que pertence ao usuário logado
+        # se não encontrar, retorna 404 em vez de crashar
+        personagem = get_object_or_404(Personagem, id=personagem_id, usuario=request.user)
+
+        # força int na comparação — mesmo motivo do entrar_personagem
+        if request.session.get('personagem_id') == int(personagem_id):
+            del request.session['personagem_id']
+
+        # deleta o personagem do banco de dados
+        personagem.delete()
+
+    # redireciona para a tela de seleção em qualquer caso
+    return redirect('selecionar_personagem')

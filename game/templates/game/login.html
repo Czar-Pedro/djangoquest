@@ -129,6 +129,32 @@
             box-shadow: inset 2px 2px 0 #000, 0 0 6px #1a4a22;
         }
 
+        .field-senha {
+            position: relative;
+        }
+
+        .field-senha input {
+            padding-right: 2.5rem;
+        }
+
+        .toggle-senha {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #4a7a52;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 0;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .toggle-senha:hover {
+            color: #6aad72;
+        }
+
         /* ── Botão ──────────────────────────────────── */
         .btn {
             width: 100%;
@@ -217,9 +243,10 @@
                     <label>USUÁRIO</label>
                     <input type="text" name="usuario" placeholder="nome de usuario" autocomplete="username">
                 </div>
-                <div class="field">
+                <div class="field field-senha">
                     <label>SENHA</label>
-                    <input type="password" name="senha" placeholder="••••••••" autocomplete="current-password">
+                    <input type="password" name="senha" placeholder="••••••••" id="input-senha" autocomplete="current-password">
+                    <button type="button" class="toggle-senha" onclick="toggleSenha()">👁</button>
                 </div>
                 <button type="submit" class="btn">▶ ENTRAR</button>
             </form>
@@ -258,6 +285,11 @@
 
         applyScale();
         window.addEventListener('resize', applyScale);
+
+        function toggleSenha() {
+            const input = document.getElementById('input-senha');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
     </script>
 </body>
 </html>

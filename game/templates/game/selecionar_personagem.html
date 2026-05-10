@@ -1,18 +1,378 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <title>Django Quest - Selecionar Personagem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("{% static 'game/login_bg.png' %}");
+            background-size: cover;
+            background-position: 65% 55%;
+            filter: brightness(1.6);
+            z-index: -1;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30vw;
+        }
+
+        .scroll-topo img,
+        .scroll-base img {
+            width: 100%;
+            display: block;
+        }
+
+        .scroll-secao {
+            width: 100%;
+            display: grid;
+            grid-template-areas: "stack";
+        }
+
+        .scroll-secao img {
+            grid-area: stack;
+            width: 100%;
+            display: block;
+        }
+
+        .scroll-secao .secao-conteudo {
+            grid-area: stack;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10% 20%;
+            gap: 0.4rem;
+            z-index: 1;
+        }
+
+        .scroll-titulo {
+            font-size: 0.6vw;
+            color: #3a2000;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .personagem-card {
+            width: 100%;
+            background: rgba(255, 220, 150, 0.25);
+            border: 2px solid #8a6020;
+            padding: 0.4rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .personagem-nome {
+            font-size: 0.5vw;
+            color: #3a2000;
+        }
+
+        .personagem-info {
+            font-size: 0.4vw;
+            color: #5a3500;
+        }
+
+        /* linha com os dois botões lado a lado */
+        .personagem-acoes {
+            display: flex;
+            gap: 0.3rem;
+            margin-top: 0.2rem;
+        }
+
+        .personagem-btn {
+            flex: 1;
+            background: #5a3500;
+            border: 1.5px solid #8a6020;
+            color: #f5d080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.4vw;
+            padding: 0.35rem;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #2a1500;
+            transition: all 0.1s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .personagem-btn:hover {
+            background: #7a4a00;
+            box-shadow: 1px 1px 0 #2a1500;
+            transform: translate(1px, 1px);
+        }
+
+        /* botão deletar — tom vermelho escuro para diferenciar */
+        .personagem-btn-deletar {
+            flex: 0 0 auto;
+            background: #5a0000;
+            border: 1.5px solid #8a2020;
+            color: #f5a080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.4vw;
+            padding: 0.35rem 0.5rem;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #2a0000;
+            transition: all 0.1s;
+            text-align: center;
+        }
+
+        .personagem-btn-deletar:hover {
+            background: #7a0000;
+            box-shadow: 1px 1px 0 #2a0000;
+            transform: translate(1px, 1px);
+        }
+
+        .scroll-acoes {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .btn-acao {
+            width: 100%;
+            background: #5a3500;
+            border: 1.5px solid #8a6020;
+            color: #f5d080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.4vw;
+            padding: 0.4rem;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #2a1500;
+            transition: all 0.1s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-acao:hover {
+            background: #7a4a00;
+            box-shadow: 1px 1px 0 #2a1500;
+            transform: translate(1px, 1px);
+        }
+
+        .btn-sair {
+            background: transparent;
+            color: #8a6020;
+            box-shadow: none;
+            border-color: rgba(138, 96, 32, 0.5);
+        }
+
+        .btn-sair:hover {
+            background: rgba(90, 53, 0, 0.2);
+            box-shadow: none;
+            transform: none;
+            color: #5a3500;
+        }
+
+        /* overlay de confirmação */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-overlay.ativo {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: #2a1500;
+            border: 2px solid #8a2020;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .confirm-titulo {
+            font-size: 0.65rem;
+            color: #f5a080;
+            letter-spacing: 1px;
+        }
+
+        .confirm-nome {
+            font-size: 0.55rem;
+            color: #f5d080;
+        }
+
+        .confirm-aviso {
+            font-size: 0.4rem;
+            color: #8a6020;
+            line-height: 1.8;
+        }
+
+        .confirm-botoes {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .confirm-btn {
+            flex: 1;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.45rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            border: 1.5px solid;
+            transition: all 0.1s;
+        }
+
+        .confirm-btn-cancelar {
+            background: transparent;
+            border-color: #8a6020;
+            color: #8a6020;
+        }
+
+        .confirm-btn-cancelar:hover {
+            background: rgba(138, 96, 32, 0.2);
+            color: #f5d080;
+        }
+
+        .confirm-btn-confirmar {
+            background: #5a0000;
+            border-color: #8a2020;
+            color: #f5a080;
+            box-shadow: 2px 2px 0 #2a0000;
+        }
+
+        .confirm-btn-confirmar:hover {
+            background: #7a0000;
+            box-shadow: 1px 1px 0 #2a0000;
+            transform: translate(1px, 1px);
+        }
+    </style>
 </head>
 <body>
-    <h1>Django Quest</h1>
-    <h2>Escolha seu Personagem</h2>
 
+<!-- OVERLAY DE CONFIRMAÇÃO -->
+<div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+        <div class="confirm-titulo">⚠ DELETAR HERÓI</div>
+        <div class="confirm-nome" id="confirm-nome"></div>
+        <div class="confirm-aviso">esta ação é irreversível.<br>o herói será perdido para sempre.</div>
+        <div class="confirm-botoes">
+            <button class="confirm-btn confirm-btn-cancelar" onclick="fecharConfirm()">✕ CANCELAR</button>
+            <form id="confirm-form" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="confirm-btn confirm-btn-confirmar">✓ DELETAR</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- TOPO -->
+    <div class="scroll-topo">
+        <img src="{% static 'game/pergaminho_topo.png' %}" alt="">
+    </div>
+
+    <!-- TITULO -->
+    <div class="scroll-secao">
+        <img src="{% static 'game/pergaminho_meio.png' %}" alt="">
+        <div class="secao-conteudo">
+            <div class="scroll-titulo">▸ HERÓIS ◂</div>
+        </div>
+    </div>
+
+    <!-- UM MEIO POR PERSONAGEM -->
     {% for personagem in personagens %}
-        <p>{{ personagem.nome }} - {{ personagem.get_classe_display }} - Nível {{ personagem.nivel }}</p>
-        <a href="{% url 'entrar_personagem' personagem.id %}">Jogar com este</a><br><br>
+    <div class="scroll-secao">
+        <img src="{% static 'game/pergaminho_meio.png' %}" alt="">
+        <div class="secao-conteudo">
+            <div class="personagem-card">
+                <div class="personagem-nome">{{ personagem.nome }}</div>
+                <div class="personagem-info">{{ personagem.get_classe_display }} · Nível {{ personagem.nivel }}</div>
+                <div class="personagem-acoes">
+                    <a href="{% url 'entrar_personagem' personagem.id %}" class="personagem-btn">▶ JOGAR</a>
+                    <button
+                        class="personagem-btn-deletar"
+                        onclick="abrirConfirm('{{ personagem.nome }}', '{% url 'deletar_personagem' personagem.id %}')"
+                    >✕</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="scroll-secao">
+        <img src="{% static 'game/pergaminho_meio.png' %}" alt="">
+        <div class="secao-conteudo">
+            <div class="personagem-info" style="text-align:center;">nenhum herói criado ainda...</div>
+        </div>
+    </div>
     {% endfor %}
 
-    <a href="{% url 'criar_personagem' %}">Criar novo personagem</a><br>
-    <a href="{% url 'logout' %}">Sair</a>
+    <!-- ACOES -->
+    <div class="scroll-secao">
+        <img src="{% static 'game/pergaminho_meio.png' %}" alt="">
+        <div class="secao-conteudo">
+            <div class="scroll-acoes">
+                <a href="{% url 'criar_personagem' %}" class="btn-acao">+ NOVO HERÓI</a>
+                <a href="{% url 'logout' %}" class="btn-acao btn-sair">◀ SAIR</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BASE -->
+    <div class="scroll-base">
+        <img src="{% static 'game/pergaminho_base.png' %}" alt="">
+    </div>
+
+</div>
+
+<script>
+    function abrirConfirm(nome, url) {
+        document.getElementById('confirm-nome').textContent = nome;
+        document.getElementById('confirm-form').action = url;
+        document.getElementById('confirm-overlay').classList.add('ativo');
+    }
+
+    function fecharConfirm() {
+        document.getElementById('confirm-overlay').classList.remove('ativo');
+    }
+
+    // fecha ao clicar fora da caixa
+    document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+        if (e.target === this) fecharConfirm();
+    });
+</script>
+
 </body>
 </html>

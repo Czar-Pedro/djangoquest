@@ -21,4 +21,5 @@ urlpatterns = [
     path('batalha/item/<int:item_id>/', views.usar_item_batalha, name='usar_item_batalha'),
     path('inventario/', views.inventario, name='inventario'),
     path('inventario/equipar/<int:item_id>/', views.equipar_item, name='equipar_item'),
+    path('deletar-personagem/<int:personagem_id>/', views.deletar_personagem, name='deletar_personagem'),
 ]

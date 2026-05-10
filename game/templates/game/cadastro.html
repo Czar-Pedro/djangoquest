@@ -1,22 +1,271 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Django Quest - cadastro</title>
+    <title>Django Quest - Cadastro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("{% static 'game/login_bg.png' %}");
+            background-size: cover;
+            background-position: 10% 25%;
+            filter: brightness(1.6);
+            z-index: -1;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 0;
+        }
+
+        .viewport-scale {
+            position: relative;
+            z-index: 1;
+            width: 420px;
+            height: auto;
+            transform-origin: center center;
+            transform: scale(var(--scale, 1));
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title h1 {
+            font-size: 20px;
+            color: #c8e6c0;
+            text-shadow: 0 0 10px #2d6a3f, 0 2px 0 #000;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .title p {
+            font-size: 7px;
+            color: #6aad72;
+            letter-spacing: 1px;
+        }
+
+        .panel {
+            background: rgba(8, 20, 10, 0.88);
+            border: 3px solid #1e3d24;
+            box-shadow: 4px 4px 0 #000, 0 0 24px rgba(13, 42, 26, 0.8);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid #1a3020;
+            pointer-events: none;
+        }
+
+        .panel-title {
+            font-size: 10px;
+            color: #6aad72;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .field {
+            margin-bottom: 1.25rem;
+        }
+
+        .field label {
+            display: block;
+            font-size: 7px;
+            color: #4a7a52;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .field input {
+            width: 100%;
+            background: #060d08;
+            border: 2px solid #1e3d24;
+            color: #a8d8b0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            padding: 0.75rem;
+            outline: none;
+            box-shadow: inset 2px 2px 0 #000;
+        }
+
+        .field input:focus {
+            border-color: #3d8a4a;
+            box-shadow: inset 2px 2px 0 #000, 0 0 6px #1a4a22;
+        }
+        .field-senha {
+            position: relative;
+        }
+
+        .field-senha input {
+            padding-right: 2.5rem;
+        }
+
+        .toggle-senha {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #4a7a52;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 0;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .toggle-senha:hover {
+            color: #6aad72;
+        }
+
+        .btn {
+            width: 100%;
+            background: #1a3d22;
+            border: 2px solid #3d8a4a;
+            color: #a8d8b0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
+            padding: 0.875rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+            box-shadow: 3px 3px 0 #000;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: #245230;
+            color: #c8e6c0;
+            box-shadow: 1px 1px 0 #000;
+            transform: translate(2px, 2px);
+        }
+
+        .btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
+
+        .login {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 7px;
+            color: #4a7a52;
+            letter-spacing: 1px;
+        }
+
+        .login a {
+            color: #6aad72;
+            text-decoration: none;
+        }
+
+        .login a:hover { color: #a8d8b0; }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #1a3020;
+            margin: 1.25rem 0;
+        }
+
+        .erro {
+            font-size: 7px;
+            color: #e05555;
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 500px) {
+            .viewport-scale {
+                width: 90vw;
+                transform: none !important;
+            }
+
+            
+        }
+    </style>
 </head>
 <body>
-    <h1>Django Quest</h1>
-    <h2>cadastro</h2>
-{% if erro %}
-    <p style="color:red;">{{ erro }}</p>
-{% endif %}
-    <form method="POST">
-        {% csrf_token %}
-        <label>Usuário:</label>
-        <input type="text" name="usuario"><br><br>
-        <label>Senha:</label>
-        <input type="password" name="senha"><br><br>
-        <button type="submit">cadastrar</button>
-    </form>
-    <p>ja tem uma conta? <a href="{% url 'login' %}">entre por aqui</a></p>
+
+    <div class="viewport-scale" id="vp">
+        <div class="title">
+            <h1>CORRUPÇÃO</h1>
+            <p>► uma aventura começa aqui ◄</p>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">▸ CADASTRAR ◂</div>
+
+            {% if erro %}
+                <p class="erro">{{ erro }}</p>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="field">
+                    <label>USUÁRIO</label>
+                    <input type="text" name="usuario" placeholder="escolha um nome" autocomplete="username">
+                </div>
+                <div class="field field-senha">
+                    <label>SENHA</label>
+                    <input type="password" name="senha" placeholder="••••••••" id="input-senha" autocomplete="current-password">
+                    <button type="button" class="toggle-senha" onclick="toggleSenha()">👁</button>
+                </div>
+                <button type="submit" class="btn">▶ CADASTRAR</button>
+            </form>
+
+            <hr class="divider">
+
+            <div class="login">
+                já tem conta? <a href="{% url 'login' %}">entre por aqui</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DESIGN_W = 420;
+        const DESIGN_H = 420;
+        const vp = document.getElementById('vp');
+
+        function toggleSenha() {
+            const input = document.getElementById('input-senha');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function applyScale() {
+            if (window.innerWidth <= 500) return;
+            const scaleX = window.innerWidth  / (DESIGN_W * 2.2);
+            const scaleY = window.innerHeight / (DESIGN_H * 1.4);
+            const scale  = Math.min(scaleX, scaleY, 2.5);
+            vp.style.setProperty('--scale', scale);
+        }
+
+        applyScale();
+        window.addEventListener('resize', applyScale);
+    </script>
+    
 </body>
 </html>
