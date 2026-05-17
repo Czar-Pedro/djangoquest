@@ -42,9 +42,9 @@
         .hotspot-fogo {
             position: fixed;
             left: 5%;
-            top: 25%;
+            top: 35%;
             width: 25%;
-            height: 55%;
+            height:60%;
             z-index: 5;
             cursor: not-allowed;
         }
@@ -52,9 +52,9 @@
         .hotspot-shop {
             position: fixed;
             right: 0%;
-            top: 15%;
+            top: 0%;
             width: 30%;
-            height: 65%;
+            height: 100%;
             z-index: 5;
             cursor: pointer;
             text-decoration: none;
@@ -62,8 +62,8 @@
 
         .hotspot-floresta {
             position: fixed;
-            left: 35%;
-            top: 30%;
+            left: 34%;
+            top: -5%;
             width: 30%;
             height: 50%;
             z-index: 5;
@@ -145,7 +145,7 @@
         }
 
         .barra-stat {
-            font-size: 0.45vw;
+            font-size: 0.7vw;
             color: #c8b090;
             letter-spacing: 1px;
         }
@@ -161,8 +161,8 @@
         }
 
         .hp-bar, .mp-bar {
-            width: 8vw;
-            height: 6px;
+            width: 10vw;
+            height: 8px;
             border: 1px solid #4a3a2a;
         }
 
@@ -184,13 +184,14 @@
             border: 2px solid #8a6020;
             color: #f5d080;
             font-family: 'Press Start 2P', monospace;
-            font-size: 0.5vw;
-            padding: 0.5rem 1rem;
+            font-size: 0.7vw;
+            padding: 0.6rem 1.2rem;
             cursor: pointer;
             text-decoration: none;
             letter-spacing: 1px;
             transition: all 0.15s;
         }
+
 
         .btn-inventario:hover {
             background: rgba(90, 60, 10, 0.9);
@@ -215,7 +216,7 @@
         /* aviso em breve */
         #aviso-fogo {
             position: fixed;
-            left: 18%;
+            left: 15%;
             top: 22%;
             z-index: 10;
             font-family: 'Press Start 2P', monospace;
@@ -245,6 +246,7 @@
     <div class="cantos-esquerdo">
         <a href="{% url 'mundo' %}" class="btn-canto">◀ MAPA MUNDO</a>
         <a href="{% url 'logout' %}" class="btn-canto">✕ SAIR</a>
+        <button onclick="history.back()" class="btn-canto">🔙 VOLTAR</button>
         <span class="btn-canto desativado">⚙ CONFIG</span>
     </div>
 
@@ -292,7 +294,7 @@
                     <div class="mp-bar-fill" style="width: {% widthratio personagem.mp_atual personagem.mp_maximo 100 %}%"></div>
                 </div>
             </div>
-            <div class="barra-stat">Gold <span>{{ personagem.gold }} 🪙</span></div>
+            <div class="barra-stat">Gold <span>{{ personagem.gold }}</span></div>
         </div>
         <a href="{% url 'inventario' %}" class="btn-inventario">🎒 INVENTÁRIO</a>
     </div>
