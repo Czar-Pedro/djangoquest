@@ -246,7 +246,7 @@
     <div class="cantos-esquerdo">
         <a href="{% url 'mundo' %}" class="btn-canto">◀ MAPA MUNDO</a>
         <a href="{% url 'logout' %}" class="btn-canto">✕ SAIR</a>
-        <button onclick="history.back()" class="btn-canto">🔙 VOLTAR</button>
+        <a href="{% url 'mapa' %}" class="btn-canto">🔙 VOLTAR</a>
         <span class="btn-canto desativado">⚙ CONFIG</span>
     </div>
 
@@ -294,7 +294,7 @@
                     <div class="mp-bar-fill" style="width: {% widthratio personagem.mp_atual personagem.mp_maximo 100 %}%"></div>
                 </div>
             </div>
-            <div class="barra-stat">Gold <span>{{ personagem.gold }}</span></div>
+            <div class="barra-stat">Gold <span>{{ personagem.gold }}💰</span></div>
         </div>
         <a href="{% url 'inventario' %}" class="btn-inventario">🎒 INVENTÁRIO</a>
     </div>

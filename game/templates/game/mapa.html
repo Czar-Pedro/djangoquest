@@ -1,37 +1,356 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Django Quest - Mapa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- FUNDO --- */
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .bg-base     { background-image: url("{% static 'game/mapa_bg.jpeg' %}"); }
+        .bg-floresta { background-image: url("{% static 'game/mapa_bg_floresta.jpg' %}"); }
+        .bg-caverna  { background-image: url("{% static 'game/mapa_bg_caverna.jpg' %}"); }
+        .bg-castelo  { background-image: url("{% static 'game/mapa_bg_castelo.jpg' %}"); }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- HOTSPOTS --- */
+        /* floresta — lado esquerdo */
+        .hotspot-floresta {
+            position: fixed;
+            left: 0%;
+            top: 22%;
+            width: 30%;
+            height: 80%;
+            z-index: 5;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 20rem;
+        }
+
+        .hotspot-floresta span {
+            font-size: 0.7vw;
+            color: transparent;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+            text-shadow: 0 0 8px #000;
+        }
+
+        .hotspot-floresta:hover span {
+            color: #a0d080;
+        }
+
+        /* castelo — centro */
+        .hotspot-castelo {
+            position: fixed;
+            left: 33%;
+            top: 0%;
+            width: 30%;
+            height: 50%;
+            z-index: 5;
+            text-decoration: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 2rem;
+        }
+
+        .hotspot-castelo span {
+            font-size: 0.7vw;
+            color: transparent;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+            text-shadow: 0 0 8px #000;
+        }
+
+        .hotspot-castelo:hover span {
+            color: #d0a0f0;
+        }
+
+        .hotspot-castelo.bloqueado {
+            cursor: not-allowed;
+        }
+
+        /* caverna — lado direito */
+        .hotspot-caverna {
+            position: fixed;
+            right: 0%;
+            top: 0%;
+            width: 30%;
+            height: 80%;
+            z-index: 5;
+            text-decoration: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 8rem;
+            padding-right: 2rem;
+        }
+
+        .hotspot-caverna span {
+            font-size: 0.7vw;
+            color: transparent;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+            text-shadow: 0 0 8px #000;
+        }
+
+        .hotspot-caverna:hover span {
+            color: #60c0f0;
+        }
+
+        .hotspot-caverna.bloqueada {
+            cursor: not-allowed;
+        }
+
+        /* --- BOTOES CANTO SUPERIOR ESQUERDO --- */
+        .cantos-esquerdo {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .btn-canto {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #4a3a2a;
+            color: #c8b090;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5vw;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            transition: all 0.15s;
+            letter-spacing: 1px;
+        }
+
+        .btn-canto:hover {
+            background: rgba(60, 40, 20, 0.8);
+            border-color: #8a6040;
+            color: #f5d080;
+        }
+
+        .btn-canto.desativado {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* --- TITULO --- */
+        .mapa-titulo {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-size: 0.8vw;
+            color: #c8b090;
+            text-shadow: 0 0 8px #000, 2px 2px 0 #000;
+            letter-spacing: 3px;
+        }
+
+        /* --- BARRA INFERIOR --- */
+        .barra-inferior {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 2px solid #4a3a2a;
+            padding: 0.6rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .barra-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .barra-stat {
+            font-size: 0.7vw;
+            color: #c8b090;
+            letter-spacing: 1px;
+        }
+
+        .barra-stat span {
+            color: #f5d080;
+        }
+
+        .hp-bar-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .hp-bar, .mp-bar {
+            width: 10vw;
+            height: 8px;
+            border: 1px solid #4a3a2a;
+        }
+
+        .hp-bar { background: #2a1a1a; }
+        .mp-bar { background: #1a1a2a; }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: #c03030;
+        }
+
+        .mp-bar-fill {
+            height: 100%;
+            background: #3060c0;
+        }
+
+        .btn-inventario {
+            background: rgba(40, 30, 10, 0.8);
+            border: 2px solid #8a6020;
+            color: #f5d080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7vw;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: all 0.15s;
+        }
+
+        .btn-inventario:hover {
+            background: rgba(90, 60, 10, 0.9);
+            border-color: #c8a040;
+            color: #fff;
+        }
+
+        /* label de área bloqueada */
+        .bloqueado-label {
+            font-size: 0.5vw;
+            color: #ff4040;
+            text-shadow: 0 0 8px #000;
+            letter-spacing: 1px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Django Quest</h1>
-    <h2>Olá, {{ personagem.nome }}!</h2>
-    <p>Classe: {{ personagem.get_classe_display }}</p>
-    <p>Nível: {{ personagem.nivel }}</p>
-    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
-    <p>MP: {{ personagem.mp_atual }}/{{ personagem.mp_maximo }}</p>
-    <p>Defesa: {{ personagem.defesa }}</p>
-    <p>Ataque: {{ personagem.ataque }}</p>
-    <p>Gold: {{ personagem.gold }}</p>
-    <a href="{% url 'inventario' %}">🎒 Inventário</a>
 
-    <h3>Escolha uma área:</h3>
+    <!-- FUNDO -->
+    <div class="bg bg-base" id="bg"></div>
+    <div class="bg-overlay"></div>
 
-    <a href="{% url 'vila' 'floresta' %}">🌲 Floresta</a><br><br>
+    <!-- TITULO -->
+    <div class="mapa-titulo">REINO I</div>
 
-    {% if personagem.area_desbloqueada == 'caverna' or personagem.area_desbloqueada == 'castelo' %}
-        <a href="{% url 'vila' 'caverna' %}">🪨 Caverna</a>
-    {% else %}
-        🪨 Caverna (bloqueada)
-    {% endif %}<br><br>
+    <!-- BOTOES CANTO SUPERIOR ESQUERDO -->
+    <div class="cantos-esquerdo">
+        <a href="{% url 'logout' %}" class="btn-canto">✕ SAIR</a>
+        <button onclick="history.back()" class="btn-canto">🔙 VOLTAR</button>
+        <span class="btn-canto desativado">⚙ CONFIG</span>
+    </div>
 
+    <!-- HOTSPOT FLORESTA -->
+    <a href="{% url 'vila' 'floresta' %}" class="hotspot-floresta"
+       onmouseenter="setBg('floresta')"
+       onmouseleave="setBg('base')">
+        <span>🌲 FLORESTA</span>
+    </a>
+
+    <!-- HOTSPOT CASTELO -->
     {% if personagem.area_desbloqueada == 'castelo' %}
-        <a href="{% url 'vila' 'castelo' %}">🏰 Castelo</a>
+    <a href="{% url 'vila' 'castelo' %}" class="hotspot-castelo"
+       onmouseenter="setBg('castelo')"
+       onmouseleave="setBg('base')">
+        <span>🏰 CASTELO</span>
+    </a>
     {% else %}
-        🏰 Castelo (bloqueado)
-    {% endif %}<br><br>
+    <div class="hotspot-castelo bloqueado"
+         onmouseenter="setBg('castelo')"
+         onmouseleave="setBg('base')">
+        <span class="bloqueado-label">🔒 CASTELO</span>
+    </div>
+    {% endif %}
 
-    <a href="{% url 'logout' %}">Sair</a>
-    <button onclick="history.back()">🔙 Voltar</button>
+    <!-- HOTSPOT CAVERNA -->
+    {% if personagem.area_desbloqueada == 'caverna' or personagem.area_desbloqueada == 'castelo' %}
+    <a href="{% url 'vila' 'caverna' %}" class="hotspot-caverna"
+       onmouseenter="setBg('caverna')"
+       onmouseleave="setBg('base')">
+        <span>🪨 CAVERNA</span>
+    </a>
+    {% else %}
+    <div class="hotspot-caverna bloqueada"
+         onmouseenter="setBg('caverna')"
+         onmouseleave="setBg('base')">
+        <span class="bloqueado-label">🔒 CAVERNA</span>
+    </div>
+    {% endif %}
+
+    <!-- BARRA INFERIOR -->
+    <div class="barra-inferior">
+        <div class="barra-info">
+            <div class="barra-stat"><span>{{ personagem.nome }}</span></div>
+            <div class="barra-stat">Classe <span>{{ personagem.get_classe_display }}</span></div>
+            <div class="barra-stat">Nível <span>{{ personagem.nivel }}</span></div>
+            <div class="barra-stat">XP <span>{{ personagem.experiencia }}</span></div>
+            <div class="hp-bar-wrap">
+                <div class="barra-stat">HP <span>{{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</span></div>
+                <div class="hp-bar">
+                    <div class="hp-bar-fill" style="width: {% widthratio personagem.hp_atual personagem.hp_maximo 100 %}%"></div>
+                </div>
+                <div class="barra-stat">MP <span>{{ personagem.mp_atual }}/{{ personagem.mp_maximo }}</span></div>
+                <div class="mp-bar">
+                    <div class="mp-bar-fill" style="width: {% widthratio personagem.mp_atual personagem.mp_maximo 100 %}%"></div>
+                </div>
+            </div>
+            <div class="barra-stat">Gold <span>{{ personagem.gold }} 🪙</span></div>
+        </div>
+        <a href="{% url 'inventario' %}" class="btn-inventario">🎒 INVENTÁRIO</a>
+    </div>
+
+    <script>
+        function setBg(tipo) {
+            document.getElementById('bg').className = 'bg bg-' + tipo;
+        }
+
+        // precarrega imagens
+        [
+            '{% static "game/mapa_bg_floresta.jpg" %}',
+            '{% static "game/mapa_bg_caverna.jpg" %}',
+            '{% static "game/mapa_bg_castelo.jpg" %}'
+        ].forEach(src => new Image().src = src);
+    </script>
+
 </body>
 </html>
