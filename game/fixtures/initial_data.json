@@ -1,0 +1,1012 @@
+[
+{
+  "model": "game.item",
+  "pk": 1,
+  "fields": {
+    "nome": "Espada Enferrujada",
+    "tipo": "arma",
+    "preco": 20,
+    "bonus_ataque": 8,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "s_enferrujada.jpg",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 2,
+  "fields": {
+    "nome": "Espada de Madeira",
+    "tipo": "arma",
+    "preco": 35,
+    "bonus_ataque": 12,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "s_madeira.jpg",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 3,
+  "fields": {
+    "nome": "Espada de Ferro",
+    "tipo": "arma",
+    "preco": 60,
+    "bonus_ataque": 18,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 4,
+  "fields": {
+    "nome": "Espada de Aço",
+    "tipo": "arma",
+    "preco": 100,
+    "bonus_ataque": 25,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 5,
+  "fields": {
+    "nome": "Espada Élfica",
+    "tipo": "arma",
+    "preco": 160,
+    "bonus_ataque": 34,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 6,
+  "fields": {
+    "nome": "Espada Lendária",
+    "tipo": "arma",
+    "preco": 250,
+    "bonus_ataque": 45,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 7,
+  "fields": {
+    "nome": "Cajado Quebrado",
+    "tipo": "arma",
+    "preco": 20,
+    "bonus_ataque": 5,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 5,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 8,
+  "fields": {
+    "nome": "Cajado de Bambu",
+    "tipo": "arma",
+    "preco": 35,
+    "bonus_ataque": 8,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 10,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 9,
+  "fields": {
+    "nome": "Cajado de Carvalho",
+    "tipo": "arma",
+    "preco": 60,
+    "bonus_ataque": 12,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 18,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 10,
+  "fields": {
+    "nome": "Cajado Arcano",
+    "tipo": "arma",
+    "preco": 100,
+    "bonus_ataque": 18,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 28,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 11,
+  "fields": {
+    "nome": "Cajado de Cristal",
+    "tipo": "arma",
+    "preco": 160,
+    "bonus_ataque": 26,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 40,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 12,
+  "fields": {
+    "nome": "Cajado Lendário",
+    "tipo": "arma",
+    "preco": 250,
+    "bonus_ataque": 36,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 55,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 13,
+  "fields": {
+    "nome": "Faca Enferrujada",
+    "tipo": "arma",
+    "preco": 20,
+    "bonus_ataque": 7,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 14,
+  "fields": {
+    "nome": "Adaga Simples",
+    "tipo": "arma",
+    "preco": 35,
+    "bonus_ataque": 11,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 15,
+  "fields": {
+    "nome": "Adaga Afiada",
+    "tipo": "arma",
+    "preco": 60,
+    "bonus_ataque": 16,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 16,
+  "fields": {
+    "nome": "Adaga Sombria",
+    "tipo": "arma",
+    "preco": 100,
+    "bonus_ataque": 23,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 17,
+  "fields": {
+    "nome": "Adaga Éléctrica",
+    "tipo": "arma",
+    "preco": 160,
+    "bonus_ataque": 32,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 18,
+  "fields": {
+    "nome": "Adaga Lendária",
+    "tipo": "arma",
+    "preco": 250,
+    "bonus_ataque": 43,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 19,
+  "fields": {
+    "nome": "Arco Quebrado",
+    "tipo": "arma",
+    "preco": 20,
+    "bonus_ataque": 6,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 20,
+  "fields": {
+    "nome": "Arco Simples",
+    "tipo": "arma",
+    "preco": 35,
+    "bonus_ataque": 10,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 21,
+  "fields": {
+    "nome": "Arco Longo",
+    "tipo": "arma",
+    "preco": 60,
+    "bonus_ataque": 15,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 22,
+  "fields": {
+    "nome": "Arco Reforçado",
+    "tipo": "arma",
+    "preco": 100,
+    "bonus_ataque": 22,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 23,
+  "fields": {
+    "nome": "Arco Élfio",
+    "tipo": "arma",
+    "preco": 160,
+    "bonus_ataque": 31,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 24,
+  "fields": {
+    "nome": "Arco Lendário",
+    "tipo": "arma",
+    "preco": 250,
+    "bonus_ataque": 42,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 25,
+  "fields": {
+    "nome": "Armadura Enferrujada",
+    "tipo": "armadura",
+    "preco": 22,
+    "bonus_ataque": 0,
+    "bonus_defesa": 8,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 26,
+  "fields": {
+    "nome": "Armadura de Couro",
+    "tipo": "armadura",
+    "preco": 38,
+    "bonus_ataque": 0,
+    "bonus_defesa": 12,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 27,
+  "fields": {
+    "nome": "Armadura de Ferro",
+    "tipo": "armadura",
+    "preco": 65,
+    "bonus_ataque": 0,
+    "bonus_defesa": 18,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 28,
+  "fields": {
+    "nome": "Armadura de Aço",
+    "tipo": "armadura",
+    "preco": 110,
+    "bonus_ataque": 0,
+    "bonus_defesa": 25,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 29,
+  "fields": {
+    "nome": "Armadura Élfica",
+    "tipo": "armadura",
+    "preco": 170,
+    "bonus_ataque": 0,
+    "bonus_defesa": 34,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 30,
+  "fields": {
+    "nome": "Armadura Lendária",
+    "tipo": "armadura",
+    "preco": 260,
+    "bonus_ataque": 0,
+    "bonus_defesa": 45,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 31,
+  "fields": {
+    "nome": "Robe Simples",
+    "tipo": "armadura",
+    "preco": 22,
+    "bonus_ataque": 0,
+    "bonus_defesa": 4,
+    "bonus_hp": 0,
+    "bonus_mp": 8,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 32,
+  "fields": {
+    "nome": "Robe de Linho",
+    "tipo": "armadura",
+    "preco": 38,
+    "bonus_ataque": 0,
+    "bonus_defesa": 7,
+    "bonus_hp": 0,
+    "bonus_mp": 14,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 33,
+  "fields": {
+    "nome": "Robe de Seda",
+    "tipo": "armadura",
+    "preco": 65,
+    "bonus_ataque": 0,
+    "bonus_defesa": 11,
+    "bonus_hp": 0,
+    "bonus_mp": 22,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 34,
+  "fields": {
+    "nome": "Robe Arcano",
+    "tipo": "armadura",
+    "preco": 110,
+    "bonus_ataque": 0,
+    "bonus_defesa": 16,
+    "bonus_hp": 0,
+    "bonus_mp": 32,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 35,
+  "fields": {
+    "nome": "Robe de Cristal",
+    "tipo": "armadura",
+    "preco": 170,
+    "bonus_ataque": 0,
+    "bonus_defesa": 23,
+    "bonus_hp": 0,
+    "bonus_mp": 45,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 36,
+  "fields": {
+    "nome": "Robe Lendário",
+    "tipo": "armadura",
+    "preco": 260,
+    "bonus_ataque": 0,
+    "bonus_defesa": 32,
+    "bonus_hp": 0,
+    "bonus_mp": 60,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "mago"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 37,
+  "fields": {
+    "nome": "Manto Surrado",
+    "tipo": "armadura",
+    "preco": 20,
+    "bonus_ataque": 0,
+    "bonus_defesa": 5,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao,"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 38,
+  "fields": {
+    "nome": "Manto Simples",
+    "tipo": "armadura",
+    "preco": 36,
+    "bonus_ataque": 0,
+    "bonus_defesa": 9,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 39,
+  "fields": {
+    "nome": "Manto de Couro",
+    "tipo": "armadura",
+    "preco": 62,
+    "bonus_ataque": 0,
+    "bonus_defesa": 14,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 40,
+  "fields": {
+    "nome": "Manto das Sombras",
+    "tipo": "armadura",
+    "preco": 105,
+    "bonus_ataque": 0,
+    "bonus_defesa": 20,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 41,
+  "fields": {
+    "nome": "Manto Negro",
+    "tipo": "armadura",
+    "preco": 166,
+    "bonus_ataque": 0,
+    "bonus_defesa": 28,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 42,
+  "fields": {
+    "nome": "Manto Lendário",
+    "tipo": "armadura",
+    "preco": 255,
+    "bonus_ataque": 0,
+    "bonus_defesa": 38,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "ladrao"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 43,
+  "fields": {
+    "nome": "Couro Surrado",
+    "tipo": "armadura",
+    "preco": 21,
+    "bonus_ataque": 0,
+    "bonus_defesa": 6,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 44,
+  "fields": {
+    "nome": "Couro Simples",
+    "tipo": "armadura",
+    "preco": 37,
+    "bonus_ataque": 0,
+    "bonus_defesa": 10,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 45,
+  "fields": {
+    "nome": "Couro Reforçado",
+    "tipo": "armadura",
+    "preco": 63,
+    "bonus_ataque": 0,
+    "bonus_defesa": 15,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 46,
+  "fields": {
+    "nome": "Couro Élfio",
+    "tipo": "armadura",
+    "preco": 108,
+    "bonus_ataque": 0,
+    "bonus_defesa": 22,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 47,
+  "fields": {
+    "nome": "Couro Encantado",
+    "tipo": "armadura",
+    "preco": 168,
+    "bonus_ataque": 0,
+    "bonus_defesa": 30,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 48,
+  "fields": {
+    "nome": "Couro Lendário",
+    "tipo": "armadura",
+    "preco": 259,
+    "bonus_ataque": 0,
+    "bonus_defesa": 40,
+    "bonus_hp": 0,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 49,
+  "fields": {
+    "nome": "Poção Pequena de Vida",
+    "tipo": "consumivel",
+    "preco": 15,
+    "bonus_ataque": 0,
+    "bonus_defesa": 0,
+    "bonus_hp": 40,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro,mago,ladrao,arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 50,
+  "fields": {
+    "nome": "Poção Grande de Vida",
+    "tipo": "consumivel",
+    "preco": 40,
+    "bonus_ataque": 0,
+    "bonus_defesa": 0,
+    "bonus_hp": 120,
+    "bonus_mp": 0,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro,mago,ladrao,arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 51,
+  "fields": {
+    "nome": "Poção Pequena de Mana",
+    "tipo": "consumivel",
+    "preco": 15,
+    "bonus_ataque": 0,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 30,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro,mago,ladrao,arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 52,
+  "fields": {
+    "nome": "Poção Grande de Mana",
+    "tipo": "consumivel",
+    "preco": 40,
+    "bonus_ataque": 0,
+    "bonus_defesa": 0,
+    "bonus_hp": 0,
+    "bonus_mp": 90,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro,mago,ladrao,arqueiro"
+  }
+},
+{
+  "model": "game.item",
+  "pk": 53,
+  "fields": {
+    "nome": "Elixir",
+    "tipo": "consumivel",
+    "preco": 60,
+    "bonus_ataque": 0,
+    "bonus_defesa": 0,
+    "bonus_hp": 60,
+    "bonus_mp": 60,
+    "qtd_max": 1,
+    "imagem": "",
+    "classes_permitidas": "guerreiro,mago,ladrao,arqueiro"
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 1,
+  "fields": {
+    "nome": "lobo",
+    "area": "floresta",
+    "hp": 30,
+    "ataque": 8,
+    "defesa": 3,
+    "experiencia": 10,
+    "gold": 5,
+    "is_boss": false,
+    "imagem": "lobo.png",
+    "peso": 60,
+    "qtd_min": 1,
+    "qtd_max": 3
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 2,
+  "fields": {
+    "nome": "Urso",
+    "area": "floresta",
+    "hp": 60,
+    "ataque": 15,
+    "defesa": 8,
+    "experiencia": 25,
+    "gold": 15,
+    "is_boss": false,
+    "imagem": "urso.png",
+    "peso": 30,
+    "qtd_min": 1,
+    "qtd_max": 2
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 3,
+  "fields": {
+    "nome": "Slime",
+    "area": "caverna",
+    "hp": 80,
+    "ataque": 18,
+    "defesa": 10,
+    "experiencia": 40,
+    "gold": 50,
+    "is_boss": false,
+    "imagem": "slime.png",
+    "peso": 10,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 4,
+  "fields": {
+    "nome": "Orc",
+    "area": "caverna",
+    "hp": 120,
+    "ataque": 28,
+    "defesa": 15,
+    "experiencia": 70,
+    "gold": 40,
+    "is_boss": false,
+    "imagem": "orc.png",
+    "peso": 30,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 5,
+  "fields": {
+    "nome": "Golen de pedra",
+    "area": "floresta",
+    "hp": 150,
+    "ataque": 25,
+    "defesa": 20,
+    "experiencia": 80,
+    "gold": 48,
+    "is_boss": true,
+    "imagem": "Golen.png",
+    "peso": 10,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 6,
+  "fields": {
+    "nome": "Dragão",
+    "area": "caverna",
+    "hp": 300,
+    "ataque": 50,
+    "defesa": 30,
+    "experiencia": 200,
+    "gold": 150,
+    "is_boss": true,
+    "imagem": "Dragao.png",
+    "peso": 10,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 7,
+  "fields": {
+    "nome": "Guardião",
+    "area": "castelo",
+    "hp": 160,
+    "ataque": 38,
+    "defesa": 25,
+    "experiencia": 100,
+    "gold": 60,
+    "is_boss": false,
+    "imagem": "guardiao.png",
+    "peso": 50,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 8,
+  "fields": {
+    "nome": "Espirito",
+    "area": "castelo",
+    "hp": 220,
+    "ataque": 55,
+    "defesa": 20,
+    "experiencia": 150,
+    "gold": 90,
+    "is_boss": false,
+    "imagem": "espirito.png",
+    "peso": 30,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+},
+{
+  "model": "game.inimigo",
+  "pk": 9,
+  "fields": {
+    "nome": "Mago Negro",
+    "area": "castelo",
+    "hp": 500,
+    "ataque": 80,
+    "defesa": 40,
+    "experiencia": 400,
+    "gold": 300,
+    "is_boss": true,
+    "imagem": "mago_negro.png",
+    "peso": 10,
+    "qtd_min": 1,
+    "qtd_max": 1
+  }
+}
+]

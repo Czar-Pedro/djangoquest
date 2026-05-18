@@ -71,6 +71,8 @@ class Item(models.Model):
     bonus_defesa = models.IntegerField(default=0)
     bonus_hp = models.IntegerField(default=0)
     bonus_mp = models.IntegerField(default=0)
+    qtd_max = models.IntegerField(default=1)
+    imagem = models.CharField(max_length=100, blank=True, default='')
     classes_permitidas = models.CharField(
     max_length=100,
     default='guerreiro,mago,ladrao,arqueiro',

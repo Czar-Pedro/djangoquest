@@ -2,85 +2,468 @@
 <html>
 <head>
     <title>Django Quest - Inventário</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg:        #0d0b08;
+            --panel:     rgba(16,12,8,0.92);
+            --border:    #4a3a20;
+            --gold:      #c9932a;
+            --gold-light:#e8b84b;
+            --text:      #d4c4a0;
+            --text-dim:  #7a6a50;
+            --cell:      rgba(26,21,16,0.85);
+            --cell-hover:rgba(42,32,21,0.9);
+            --equip:     rgba(26,42,26,0.9);
+            --equip-bdr: #3a7a3a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            color: var(--text);
+            font-family: 'IM Fell English', serif;
+            min-height: 100vh;
+            background-image: url("{% static 'game/inventario_bg.jpeg' %}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(5,3,1,0.62);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header, .layout, .footer { position: relative; z-index: 1; }
+
+        /* ── HEADER ── */
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(14,10,5,0.88);
+            backdrop-filter: blur(4px);
+        }
+        .header h1 { font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
+        .header-stats { display: flex; gap: 20px; font-size: 0.85rem; color: var(--text-dim); }
+        .header-stats span { color: var(--text); }
+
+        /* ── LAYOUT ── */
+        .layout {
+            display: grid;
+            grid-template-columns: 220px 1fr 260px;
+            height: calc(100vh - 65px);
+        }
+
+        /* ── PAINEL ESQUERDO ── */
+        .status-panel {
+            border-right: 1px solid var(--border);
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            background: var(--panel);
+            backdrop-filter: blur(6px);
+        }
+        .char-name { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold); text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .char-class { font-size: 0.75rem; color: var(--text-dim); text-align: center; margin-top: -8px; letter-spacing: 2px; text-transform: uppercase; }
+        .stat-row { display: flex; flex-direction: column; gap: 4px; }
+        .stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-bar-wrap { background: #0d0b08; border: 1px solid var(--border); height: 8px; border-radius: 2px; overflow: hidden; }
+        .stat-bar { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+        .bar-hp { background: linear-gradient(90deg, #8b2020, #c93030); }
+        .bar-mp { background: linear-gradient(90deg, #1a3a6a, #2a6ac9); }
+        .stat-val { font-size: 0.75rem; color: var(--text); text-align: right; }
+        .divider { border: none; border-top: 1px solid var(--border); opacity: 0.5; }
+        .equip-slot { border: 1px solid var(--border); background: var(--cell); padding: 8px 10px; border-radius: 3px; font-size: 0.78rem; }
+        .equip-slot-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .equip-slot.filled { border-color: var(--equip-bdr); background: var(--equip); color: #7adb7a; }
+        .gold-display { text-align: center; font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--gold-light); }
+        .gold-display small { display: block; font-size: 0.65rem; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; font-family: 'IM Fell English', serif; }
+
+        /* ── CENTRO — GRADE ── */
+        .grid-panel {
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(2px);
+        }
+        .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .tab { background: rgba(14,10,5,0.7); border: 1px solid transparent; color: var(--text-dim); padding: 6px 16px; font-family: 'IM Fell English', serif; font-size: 0.9rem; cursor: pointer; border-radius: 3px; transition: all 0.2s; letter-spacing: 1px; }
+        .tab:hover { color: var(--text); border-color: var(--border); }
+        .tab.ativa { color: var(--gold); border-color: var(--gold); background: rgba(30,24,16,0.85); }
         .secao { display: none; }
         .secao.ativa { display: block; }
+        .grade-titulo { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
+        .grade { display: grid; grid-template-columns: repeat(auto-fill, 72px); gap: 6px; }
+
+        .item-cell {
+            width: 72px; height: 72px;
+            background: var(--cell);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.15s, background 0.15s, transform 0.1s;
+            overflow: hidden;
+        }
+        .item-cell:hover { border-color: var(--gold); background: var(--cell-hover); transform: scale(1.05); z-index: 2; }
+        .item-cell.selecionado { border-color: var(--gold-light); background: rgba(42,30,10,0.95); box-shadow: 0 0 14px rgba(201,147,42,0.4); }
+        .item-cell.equipado { border-color: var(--equip-bdr); background: var(--equip); }
+        .item-cell.equipado::after { content: '✓'; position: absolute; top: 3px; right: 5px; font-size: 0.6rem; color: #7adb7a; }
+
+        .item-thumb { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.9)); }
+        .item-icone { font-size: 1.8rem; line-height: 1; }
+        .item-qtd { position: absolute; bottom: 3px; right: 5px; font-size: 0.65rem; color: var(--gold-light); font-family: 'Cinzel', serif; font-weight: 600; text-shadow: 0 1px 3px #000; }
+        .item-qtd-max { position: absolute; bottom: 3px; left: 5px; font-size: 0.55rem; color: var(--text-dim); text-shadow: 0 1px 3px #000; }
+
+        /* ── PAINEL DIREITO — DETALHES ── */
+        .detail-panel {
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--panel);
+            backdrop-filter: blur(6px);
+        }
+        .detail-vazio { color: var(--text-dim); font-size: 0.85rem; text-align: center; margin-top: 60px; font-style: italic; line-height: 1.8; padding: 20px; }
+
+        /* foto grande */
+        .detail-img-wrap {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: rgba(8,5,2,0.8);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .detail-img-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 35%;
+            background: linear-gradient(to top, rgba(16,12,8,0.92), transparent);
+            pointer-events: none;
+        }
+        .detail-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            padding: 20px;
+            filter: drop-shadow(0 4px 20px rgba(201,147,42,0.3));
+            transition: opacity 0.25s;
+        }
+        .detail-img-placeholder { font-size: 5rem; filter: drop-shadow(0 0 12px rgba(201,147,42,0.3)); }
+
+        .detail-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .detail-nome { font-family: 'Cinzel', serif; font-size: 1.05rem; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .detail-tipo { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-top: -4px; }
+        .detail-stat { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px solid #1e1a12; }
+        .detail-stat-label { color: var(--text-dim); }
+        .detail-stat-val { color: var(--gold-light); font-family: 'Cinzel', serif; }
+        .detail-stat-val.pos { color: #7adb7a; }
+
+        .qtd-info { background: var(--cell); border: 1px solid var(--border); border-radius: 3px; padding: 8px 12px; font-size: 0.8rem; display: flex; justify-content: space-between; }
+        .qtd-barra-wrap { background: #0d0b08; border: 1px solid var(--border); height: 6px; border-radius: 2px; overflow: hidden; margin-top: 4px; }
+        .qtd-barra { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; transition: width 0.3s; }
+
+        .btn-equip { width: 100%; padding: 10px; font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--gold); background: transparent; color: var(--gold); cursor: pointer; border-radius: 3px; transition: all 0.2s; text-decoration: none; display: block; text-align: center; }
+        .btn-equip:hover { background: var(--gold); color: #000; }
+        .btn-equip.desequipar { border-color: var(--equip-bdr); color: #7adb7a; }
+        .btn-equip.desequipar:hover { background: var(--equip-bdr); color: #000; }
+
+        .classes-permitidas { font-size: 0.7rem; color: var(--text-dim); line-height: 1.6; }
+        .classes-permitidas span { display: inline-block; border: 1px solid var(--border); border-radius: 2px; padding: 1px 6px; margin: 2px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── FOOTER ── */
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(14,10,5,0.92); border-top: 1px solid var(--border); padding: 10px 24px; display: flex; gap: 12px; backdrop-filter: blur(4px); z-index: 10; }
+        .btn-nav { background: none; border: 1px solid var(--border); color: var(--text-dim); padding: 6px 16px; font-family: 'IM Fell English', serif; font-size: 0.85rem; cursor: pointer; border-radius: 3px; text-decoration: none; transition: all 0.2s; }
+        .btn-nav:hover { border-color: var(--gold); color: var(--gold); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     </style>
 </head>
 <body>
-    <h1>🎒 Inventário</h1>
+{% load static %}
 
-    <!-- status do personagem -->
-    <p>{{ personagem.nome }} — Nível {{ personagem.nivel }}</p>
-    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
-    <p>Ataque: {{ ataque_real }} {% if personagem.arma_equipada %}(+{{ personagem.arma_equipada.bonus_ataque }} {{ personagem.arma_equipada.nome }}){% endif %}</p>
-    <p>Defesa: {{ defesa_real }} {% if personagem.armadura_equipada %}(+{{ personagem.armadura_equipada.bonus_defesa }} {{ personagem.armadura_equipada.nome }}){% endif %}</p>
-    <p>Gold: {{ personagem.gold }} 🪙</p>
+<!-- HEADER -->
+<div class="header">
+    <h1>⚔ Inventário</h1>
+    <div class="header-stats">
+        Nível <span>{{ personagem.nivel }}</span>
+        &nbsp;·&nbsp;
+        {{ personagem.area_atual|capfirst }}
+        &nbsp;·&nbsp;
+        Batalhas <span>{{ personagem.batalhas_na_area }}/5</span>
+    </div>
+</div>
 
-    <hr>
+<div class="layout">
 
-    <!-- abas do inventário -->
-    <button onclick="mostrar('armas')">⚔️ Armas</button>
-    <button onclick="mostrar('armaduras')">🛡️ Armaduras</button>
-    <button onclick="mostrar('consumiveis')">🧪 Consumíveis</button>
-
-    <!-- seção de armas -->
-    <div id="armas" class="secao">
-        <h2>Armas</h2>
-        {% for inv in armas %}
-            <p>
-                {{ inv.item.nome }} x{{ inv.qtd }} — Ataque +{{ inv.item.bonus_ataque }}
-                {% if personagem.arma_equipada == inv.item %}
-                    ✅ Equipada
-                    <a href="{% url 'equipar_item' inv.item.id %}">Desequipar</a>
-                {% else %}
-                    <a href="{% url 'equipar_item' inv.item.id %}">Equipar</a>
-                {% endif %}
-            </p>
-        {% empty %}
-            <p>Nenhuma arma no inventário.</p>
-        {% endfor %}
+    <!-- PAINEL ESQUERDO — STATUS -->
+    <div class="status-panel">
+        <div>
+            <div class="char-name">{{ personagem.nome }}</div>
+            <div class="char-class">{{ personagem.get_classe_display }}</div>
+        </div>
+        <div class="stat-row">
+            <div class="stat-label">HP</div>
+            <div class="stat-bar-wrap"><div class="stat-bar bar-hp" style="width: {% widthratio personagem.hp_atual personagem.hp_maximo 100 %}%"></div></div>
+            <div class="stat-val">{{ personagem.hp_atual }} / {{ personagem.hp_maximo }}</div>
+        </div>
+        <div class="stat-row">
+            <div class="stat-label">MP</div>
+            <div class="stat-bar-wrap"><div class="stat-bar bar-mp" style="width: {% widthratio personagem.mp_atual personagem.mp_maximo 100 %}%"></div></div>
+            <div class="stat-val">{{ personagem.mp_atual }} / {{ personagem.mp_maximo }}</div>
+        </div>
+        <hr class="divider">
+        <div class="stat-row">
+            <div class="stat-label">Ataque</div>
+            <div class="stat-val">{{ ataque_real }}{% if personagem.arma_equipada %} <small style="color:var(--text-dim)">(+{{ personagem.arma_equipada.bonus_ataque }})</small>{% endif %}</div>
+        </div>
+        <div class="stat-row">
+            <div class="stat-label">Defesa</div>
+            <div class="stat-val">{{ defesa_real }}{% if personagem.armadura_equipada %} <small style="color:var(--text-dim)">(+{{ personagem.armadura_equipada.bonus_defesa }})</small>{% endif %}</div>
+        </div>
+        <hr class="divider">
+        <div class="equip-slot {% if personagem.arma_equipada %}filled{% endif %}">
+            <div class="equip-slot-label">⚔ Arma</div>
+            {% if personagem.arma_equipada %}{{ personagem.arma_equipada.nome }}{% else %}<span style="color:var(--text-dim);font-style:italic">Nenhuma</span>{% endif %}
+        </div>
+        <div class="equip-slot {% if personagem.armadura_equipada %}filled{% endif %}">
+            <div class="equip-slot-label">🛡 Armadura</div>
+            {% if personagem.armadura_equipada %}{{ personagem.armadura_equipada.nome }}{% else %}<span style="color:var(--text-dim);font-style:italic">Nenhuma</span>{% endif %}
+        </div>
+        <hr class="divider">
+        <div class="gold-display">
+            <small>Gold</small>
+            {{ personagem.gold }} 🪙
+        </div>
     </div>
 
-    <!-- seção de armaduras -->
-    <div id="armaduras" class="secao">
-        <h2>Armaduras</h2>
-        {% for inv in armaduras %}
-            <p>
-                {{ inv.item.nome }} x{{ inv.qtd }} — Defesa +{{ inv.item.bonus_defesa }}
-                {% if personagem.armadura_equipada == inv.item %}
-                    ✅ Equipada
-                    <a href="{% url 'equipar_item' inv.item.id %}">Desequipar</a>
-                {% else %}
-                    <a href="{% url 'equipar_item' inv.item.id %}">Equipar</a>
-                {% endif %}
-            </p>
-        {% empty %}
-            <p>Nenhuma armadura no inventário.</p>
-        {% endfor %}
+    <!-- CENTRO — GRADE -->
+    <div class="grid-panel">
+        <div class="tabs">
+            <button class="tab ativa" onclick="mostrar('armas', this)">⚔️ Armas</button>
+            <button class="tab" onclick="mostrar('armaduras', this)">🛡️ Armaduras</button>
+            <button class="tab" onclick="mostrar('consumiveis', this)">🧪 Consumíveis</button>
+        </div>
+
+        <!-- ARMAS -->
+        <div id="armas" class="secao ativa">
+            <div class="grade-titulo">Armas no inventário</div>
+            <div class="grade">
+                {% for inv in armas %}
+                <div class="item-cell {% if personagem.arma_equipada == inv.item %}equipado{% endif %}"
+                     onclick="mostrarDetalhe(
+                         '{{ inv.item.nome }}',
+                         'arma', '⚔️',
+                         {{ inv.item.bonus_ataque }}, {{ inv.item.bonus_defesa }},
+                         {{ inv.item.bonus_hp }}, {{ inv.item.bonus_mp }},
+                         {{ inv.item.preco }}, {{ inv.qtd }}, {{ inv.item.qtd_max }},
+                         '{{ inv.item.classes_permitidas }}',
+                         '{% url 'equipar_item' inv.item.id %}',
+                         {% if personagem.arma_equipada == inv.item %}true{% else %}false{% endif %},
+                         '{% if inv.item.imagem %}{% static 'game/' %}{{ inv.item.imagem }}{% endif %}'
+                     )">
+                    {% if inv.item.imagem %}<img class="item-thumb" src="{% static 'game/' %}{{ inv.item.imagem }}" alt="{{ inv.item.nome }}">
+                    {% else %}<div class="item-icone">⚔️</div>{% endif %}
+                    <div class="item-qtd">{{ inv.qtd }}</div>
+                    <div class="item-qtd-max">/{{ inv.item.qtd_max }}</div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-dim);font-style:italic;font-size:0.85rem">Nenhuma arma no inventário.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ARMADURAS -->
+        <div id="armaduras" class="secao">
+            <div class="grade-titulo">Armaduras no inventário</div>
+            <div class="grade">
+                {% for inv in armaduras %}
+                <div class="item-cell {% if personagem.armadura_equipada == inv.item %}equipado{% endif %}"
+                     onclick="mostrarDetalhe(
+                         '{{ inv.item.nome }}',
+                         'armadura', '🛡️',
+                         {{ inv.item.bonus_ataque }}, {{ inv.item.bonus_defesa }},
+                         {{ inv.item.bonus_hp }}, {{ inv.item.bonus_mp }},
+                         {{ inv.item.preco }}, {{ inv.qtd }}, {{ inv.item.qtd_max }},
+                         '{{ inv.item.classes_permitidas }}',
+                         '{% url 'equipar_item' inv.item.id %}',
+                         {% if personagem.armadura_equipada == inv.item %}true{% else %}false{% endif %},
+                         '{% if inv.item.imagem %}{% static 'game/' %}{{ inv.item.imagem }}{% endif %}'
+                     )">
+                    {% if inv.item.imagem %}<img class="item-thumb" src="{% static 'game/' %}{{ inv.item.imagem }}" alt="{{ inv.item.nome }}">
+                    {% else %}<div class="item-icone">🛡️</div>{% endif %}
+                    <div class="item-qtd">{{ inv.qtd }}</div>
+                    <div class="item-qtd-max">/{{ inv.item.qtd_max }}</div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-dim);font-style:italic;font-size:0.85rem">Nenhuma armadura no inventário.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- CONSUMÍVEIS -->
+        <div id="consumiveis" class="secao">
+            <div class="grade-titulo">Consumíveis no inventário</div>
+            <div class="grade">
+                {% for inv in consumiveis %}
+                <div class="item-cell"
+                     onclick="mostrarDetalhe(
+                         '{{ inv.item.nome }}',
+                         'consumivel', '🧪',
+                         {{ inv.item.bonus_ataque }}, {{ inv.item.bonus_defesa }},
+                         {{ inv.item.bonus_hp }}, {{ inv.item.bonus_mp }},
+                         {{ inv.item.preco }}, {{ inv.qtd }}, {{ inv.item.qtd_max }},
+                         '{{ inv.item.classes_permitidas }}',
+                         '', false,
+                         '{% if inv.item.imagem %}{% static 'game/' %}{{ inv.item.imagem }}{% endif %}'
+                     )">
+                    {% if inv.item.imagem %}<img class="item-thumb" src="{% static 'game/' %}{{ inv.item.imagem }}" alt="{{ inv.item.nome }}">
+                    {% else %}<div class="item-icone">🧪</div>{% endif %}
+                    <div class="item-qtd">{{ inv.qtd }}</div>
+                    <div class="item-qtd-max">/{{ inv.item.qtd_max }}</div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-dim);font-style:italic;font-size:0.85rem">Nenhum consumível no inventário.</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <!-- seção de consumíveis -->
-    <div id="consumiveis" class="secao">
-        <h2>Consumíveis</h2>
-        {% for inv in consumiveis %}
-            <p>{{ inv.item.nome }} x{{ inv.qtd }} — HP +{{ inv.item.bonus_hp }} MP +{{ inv.item.bonus_mp }}</p>
-        {% empty %}
-            <p>Nenhum consumível no inventário.</p>
-        {% endfor %}
+    <!-- PAINEL DIREITO — DETALHES -->
+    <div class="detail-panel">
+        <div class="detail-vazio" id="detail-vazio">
+            Selecione um item<br>para ver os detalhes
+        </div>
+        <div id="detail-conteudo" style="display:none;">
+
+            <!-- FOTO GRANDE -->
+            <div class="detail-img-wrap">
+                <img class="detail-img" id="d-img" src="" alt="" style="display:none;">
+                <div class="detail-img-placeholder" id="d-placeholder"></div>
+            </div>
+
+            <div class="detail-body">
+                <div>
+                    <div class="detail-nome" id="d-nome"></div>
+                    <div class="detail-tipo" id="d-tipo"></div>
+                </div>
+                <div id="d-stats"></div>
+                <div>
+                    <div class="qtd-info">
+                        <span style="color:var(--text-dim)">Quantidade</span>
+                        <span id="d-qtd-val" style="color:var(--gold-light);font-family:'Cinzel',serif"></span>
+                    </div>
+                    <div class="qtd-barra-wrap"><div class="qtd-barra" id="d-qtd-barra"></div></div>
+                </div>
+                <div id="d-classes"></div>
+                <div class="detail-stat">
+                    <span class="detail-stat-label">Valor de venda</span>
+                    <span class="detail-stat-val" id="d-preco"></span>
+                </div>
+                <div id="d-btn-wrap"></div>
+            </div>
+        </div>
     </div>
 
-    <br>
-    <button onclick="history.back()">🔙 Voltar</button>
-    <a href="{% url 'mundo' %}">🗺️ Mapa Mundo</a>
+</div>
 
-    <script>
-        function mostrar(secao) {
-            document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-            document.getElementById(secao).classList.add('ativa');
+<!-- FOOTER -->
+<div class="footer">
+    <button class="btn-nav" onclick="history.back()">🔙 Voltar</button>
+    <a class="btn-nav" href="{% url 'mundo' %}">🗺️ Mapa Mundo</a>
+</div>
+
+<script>
+    function mostrar(secao, btn) {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativa'));
+        document.getElementById(secao).classList.add('ativa');
+        if (btn) btn.classList.add('ativa');
+        document.querySelectorAll('.item-cell').forEach(c => c.classList.remove('selecionado'));
+        esconderDetalhe();
+    }
+
+    function esconderDetalhe() {
+        document.getElementById('detail-vazio').style.display = 'block';
+        document.getElementById('detail-conteudo').style.display = 'none';
+    }
+
+    function mostrarDetalhe(nome, tipo, icone, atk, def, hp, mp, preco, qtd, qtdMax, classes, urlEquip, equipado, imgSrc) {
+        document.querySelectorAll('.item-cell').forEach(c => c.classList.remove('selecionado'));
+        event.currentTarget.classList.add('selecionado');
+
+        document.getElementById('detail-vazio').style.display = 'none';
+        document.getElementById('detail-conteudo').style.display = 'block';
+
+        // foto grande — mostra imagem ou emoji de fallback
+        const img = document.getElementById('d-img');
+        const placeholder = document.getElementById('d-placeholder');
+        if (imgSrc) {
+            img.src = imgSrc;
+            img.alt = nome;
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
+        } else {
+            img.style.display = 'none';
+            placeholder.style.display = 'block';
+            placeholder.textContent = icone;
         }
-        // mostra armas por padrão
-        mostrar('armas');
-    </script>
+
+        document.getElementById('d-nome').textContent = nome;
+        const tipoLabel = { arma: 'Arma', armadura: 'Armadura', consumivel: 'Consumível' };
+        document.getElementById('d-tipo').textContent = tipoLabel[tipo] || tipo;
+
+        let statsHtml = '';
+        if (atk > 0) statsHtml += `<div class="detail-stat"><span class="detail-stat-label">Bônus Ataque</span><span class="detail-stat-val pos">+${atk}</span></div>`;
+        if (def > 0) statsHtml += `<div class="detail-stat"><span class="detail-stat-label">Bônus Defesa</span><span class="detail-stat-val pos">+${def}</span></div>`;
+        if (hp  > 0) statsHtml += `<div class="detail-stat"><span class="detail-stat-label">Cura HP</span><span class="detail-stat-val pos">+${hp}</span></div>`;
+        if (mp  > 0) statsHtml += `<div class="detail-stat"><span class="detail-stat-label">Recupera MP</span><span class="detail-stat-val pos">+${mp}</span></div>`;
+        if (!statsHtml) statsHtml = `<div class="detail-stat"><span class="detail-stat-label" style="font-style:italic">Sem bônus diretos</span></div>`;
+        document.getElementById('d-stats').innerHTML = statsHtml;
+
+        document.getElementById('d-qtd-val').textContent = `${qtd} / ${qtdMax}`;
+        document.getElementById('d-qtd-barra').style.width = `${Math.min(100, (qtd / qtdMax) * 100)}%`;
+        document.getElementById('d-preco').textContent = `${Math.floor(preco / 2)} 🪙`;
+
+        const classesList = classes.split(',').map(c => c.trim());
+        const classesNome = { guerreiro: 'Guerreiro', mago: 'Mago', ladrao: 'Ladrão', arqueiro: 'Arqueiro' };
+        document.getElementById('d-classes').innerHTML =
+            '<div class="classes-permitidas">' +
+            classesList.map(c => `<span>${classesNome[c] || c}</span>`).join('') +
+            '</div>';
+
+        const btnWrap = document.getElementById('d-btn-wrap');
+        if (tipo === 'arma' || tipo === 'armadura') {
+            btnWrap.innerHTML = equipado
+                ? `<a class="btn-equip desequipar" href="${urlEquip}">✓ Desequipar</a>`
+                : `<a class="btn-equip" href="${urlEquip}">Equipar</a>`;
+        } else {
+            btnWrap.innerHTML = '';
+        }
+    }
+</script>
+
 </body>
 </html>
