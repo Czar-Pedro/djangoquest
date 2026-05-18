@@ -50,6 +50,7 @@ class Inimigo(models.Model):
     gold = models.IntegerField()
     is_boss = models.BooleanField(default=False)
     imagem = models.CharField(max_length=100)
+    peso = models.IntegerField(default=10)
 
     def __str__(self):
         return f"{self.nome} ({'Boss' if self.is_boss else 'Normal'})"

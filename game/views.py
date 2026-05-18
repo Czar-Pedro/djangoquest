@@ -303,9 +303,10 @@ def iniciar_batalha(request):
     if personagem.batalhas_na_area == 4:
         inimigo = Inimigo.objects.filter(area=personagem.area_atual, is_boss=True).first()
     else:
-        # sorteia um inimigo normal da área
-        inimigos = Inimigo.objects.filter(area=personagem.area_atual, is_boss=False)
-        inimigo = random.choice(list(inimigos))
+        # sorteia um inimigo normal da área com peso
+        inimigos = list(Inimigo.objects.filter(area=personagem.area_atual, is_boss=False))
+        pesos = [inimigo.peso for inimigo in inimigos]
+        inimigo = random.choices(inimigos, weights=pesos, k=1)[0]
     
     # salva o estado da batalha na sessão
     request.session['batalha'] = {
