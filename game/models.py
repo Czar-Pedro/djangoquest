@@ -51,6 +51,8 @@ class Inimigo(models.Model):
     is_boss = models.BooleanField(default=False)
     imagem = models.CharField(max_length=100)
     peso = models.IntegerField(default=10)
+    qtd_min = models.IntegerField(default=1)
+    qtd_max = models.IntegerField(default=1)
 
     def __str__(self):
         return f"{self.nome} ({'Boss' if self.is_boss else 'Normal'})"

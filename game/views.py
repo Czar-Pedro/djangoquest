@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from .models import Personagem, Item, Inventario, Batalha, Inimigo
 from django.shortcuts import get_object_or_404
-
+import random
 
 # página inicial — verifica se o usuário está logado e redireciona
 def index(request):
@@ -253,7 +253,6 @@ def vender_item(request, item_id):
             inventario_item.delete()
     
     return redirect('loja')
-import random
 
 # verifica e aplica o level up do personagem
 def verificar_level_up(personagem):
@@ -302,24 +301,28 @@ def iniciar_batalha(request):
     # batalha 5 é sempre o boss
     if personagem.batalhas_na_area == 4:
         inimigo = Inimigo.objects.filter(area=personagem.area_atual, is_boss=True).first()
+        quantidade = 1
     else:
         # sorteia um inimigo normal da área com peso
         inimigos = list(Inimigo.objects.filter(area=personagem.area_atual, is_boss=False))
-        pesos = [inimigo.peso for inimigo in inimigos]
+        pesos = [i.peso for i in inimigos]
         inimigo = random.choices(inimigos, weights=pesos, k=1)[0]
-    
-    # salva o estado da batalha na sessão
+        quantidade = random.randint(inimigo.qtd_min, inimigo.qtd_max)
+
+    # salva sessão (vale pra boss e inimigo normal)
     request.session['batalha'] = {
         'inimigo_id': inimigo.id,
-        'inimigo_hp': inimigo.hp,
+        'inimigo_hp': inimigo.hp * quantidade,
+        'quantidade': quantidade,
         'defendendo': False,
     }
     
     return render(request, 'game/batalha.html', {
         'personagem': personagem,
         'inimigo': inimigo,
-        'inimigo_hp': inimigo.hp,
-        'mensagem': f'Um {inimigo.nome} apareceu!',
+        'inimigo_hp': inimigo.hp * quantidade,
+        'quantidade': quantidade,
+        'mensagem': f'{"Uma horda de " + str(quantidade) + "x " if quantidade > 1 else "Um "}{inimigo.nome} apareceu!',
         'inventario': Inventario.objects.filter(personagem=personagem),
     })
 
@@ -335,6 +338,7 @@ def acao_batalha(request):
     batalha = request.session.get('batalha')
     inimigo = Inimigo.objects.get(id=batalha['inimigo_id'])
     inimigo_hp = batalha['inimigo_hp']
+    quantidade = batalha.get('quantidade', 1)
     
     # pega a ação escolhida pelo jogador
     acao = request.POST.get('acao')
@@ -470,6 +474,7 @@ def acao_batalha(request):
         'inimigo_hp': inimigo_hp,
         'mensagem': mensagem,
         'inventario': Inventario.objects.filter(personagem=personagem),
+        'quantidade': quantidade,
     })
 
 
@@ -554,6 +559,7 @@ def usar_item_batalha(request, item_id):
         'inimigo_hp': inimigo_hp,
         'mensagem': mensagem,
         'inventario': inventario,
+        'quantidade': batalha.get('quantidade', 1),
     })
 
 
