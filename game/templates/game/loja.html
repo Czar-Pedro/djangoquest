@@ -1,77 +1,424 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Django Quest - Loja</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
     <style>
-        /* esconde todas as seções por padrão */
-        .secao { display: none; }
-        /* mostra a seção ativa */
-        .secao.ativa { display: block; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0612;
+        }
+
+        .loja-wrap {
+            width: 860px;
+            min-height: 520px;
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #4a3a2a;
+        }
+
+        /* --- LADO ESQUERDO --- */
+        .lado-esquerdo {
+            width: 340px;
+            min-width: 340px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            background: #1a1020;
+        }
+
+        .lado-esquerdo img {
+    position: absolute;
+    top: -17%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 110%;
+    object-fit: cover;
+    opacity: 0.92;
+}
+
+        .categorias {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 12px;
+            background: rgba(10, 6, 20, 0.75);
+            border-top: 1px solid #5a3a6a;
+        }
+
+        .cat-btn {
+            background: rgba(40, 20, 60, 0.85);
+            border: 1.5px solid #7a5a9a;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+            color: #c8a0e8;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            letter-spacing: 0.5px;
+            min-width: 60px;
+        }
+
+        .cat-btn:hover { background: rgba(90, 40, 130, 0.9); border-color: #c080f0; color: #f0c0ff; }
+        .cat-btn.ativo { background: rgba(110, 50, 160, 0.95); border-color: #d090ff; color: #fff; box-shadow: 0 0 12px rgba(180, 80, 255, 0.3); }
+        .cat-btn i { font-size: 22px; }
+
+        /* --- LADO DIREITO --- */
+        .lado-direito {
+            flex: 1;
+            background: rgba(12, 8, 22, 0.97);
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #4a3a2a;
+        }
+
+        .loja-header {
+            padding: 14px 18px;
+            background: rgba(30, 15, 50, 0.98);
+            border-bottom: 1px solid #4a3a5a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .loja-titulo {
+            font-size: 9px;
+            color: #d4a0ff;
+            letter-spacing: 2px;
+        }
+
+        .gold-display {
+            font-size: 8px;
+            color: #f5d080;
+            background: rgba(80, 50, 10, 0.6);
+            border: 1px solid #8a6020;
+            border-radius: 6px;
+            padding: 6px 10px;
+        }
+
+        /* --- LISTA DE ITENS --- */
+        .itens-lista {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .itens-lista::-webkit-scrollbar { width: 4px; }
+        .itens-lista::-webkit-scrollbar-track { background: transparent; }
+        .itens-lista::-webkit-scrollbar-thumb { background: #5a3a7a; border-radius: 4px; }
+
+        .item-card {
+            background: rgba(30, 15, 50, 0.7);
+            border: 1px solid #4a3060;
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: border-color 0.15s;
+        }
+
+        .item-card:hover { border-color: #9060c0; }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(80, 40, 120, 0.5);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c080f0;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .item-info { flex: 1; }
+
+        .item-nome {
+            font-size: 7px;
+            color: #e0c0ff;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .item-stats {
+            font-size: 6px;
+            color: #9070b0;
+            line-height: 1.6;
+        }
+
+        .item-preco {
+            font-size: 7px;
+            color: #f5d080;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .btn-comprar {
+            display: block;
+            margin-top: 6px;
+            background: rgba(80, 40, 10, 0.7);
+            border: 1px solid #8a6020;
+            border-radius: 5px;
+            color: #f5d080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-comprar:hover { background: rgba(120, 70, 10, 0.9); border-color: #c8a040; color: #fff; }
+
+        /* --- SEÇÕES --- */
+        .secao { display: none; flex-direction: column; gap: 8px; }
+        .secao.ativa { display: flex; }
+
+        /* --- FOOTER --- */
+        .loja-footer {
+            padding: 10px 14px;
+            background: rgba(20, 10, 35, 0.98);
+            border-top: 1px solid #3a2550;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-footer {
+            background: rgba(20, 10, 35, 0.8);
+            border: 1px solid #4a3060;
+            border-radius: 6px;
+            color: #9070b0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .btn-footer:hover { border-color: #7050a0; color: #c0a0e0; }
+        .btn-footer.vender { color: #f5d080; border-color: #8a6020; }
+        .btn-footer.vender:hover { background: rgba(80, 50, 10, 0.5); border-color: #c8a040; }
+        .btn-footer.voltar { color: #80c0a0; border-color: #306050; }
+        .btn-footer.voltar:hover { background: rgba(10, 50, 30, 0.5); border-color: #60c090; }
+
+        /* --- VENDER --- */
+        .btn-vender {
+            display: block;
+            margin-top: 6px;
+            background: rgba(60, 40, 10, 0.7);
+            border: 1px solid #8a6020;
+            border-radius: 5px;
+            color: #f5d080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-vender:hover { background: rgba(100, 70, 10, 0.9); border-color: #c8a040; color: #fff; }
+
+        .vender-preco { color: #90c070; }
     </style>
 </head>
 <body>
-    <h1>Loja</h1>
-    <p>Gold: {{ personagem.gold }} 🪙</p>
 
-    <!-- botões de abas -->
-    <button onclick="mostrar('armas')">⚔️ Armas</button>
-    <button onclick="mostrar('armaduras')">🛡️ Armaduras</button>
-    <button onclick="mostrar('consumiveis')">🧪 Consumíveis</button>
-    <button onclick="mostrar('vender')">💰 Vender</button>
+<div class="loja-wrap">
 
-    <!-- seção de armas -->
-    <div id="armas" class="secao">
-        <h2>Armas</h2>
-        {% for item in armas %}
-            <p>{{ item.nome }} — Ataque +{{ item.bonus_ataque }} — {{ item.preco }} 🪙
-                <a href="{% url 'comprar_item' item.id %}">Comprar</a>
-            </p>
-        {% endfor %}
+    <!-- LADO ESQUERDO: imagem + categorias -->
+    <div class="lado-esquerdo">
+        <img src="{% static 'game/amorzinho.jpeg' %}" alt="loja">
+        <div class="categorias">
+            <button class="cat-btn ativo" onclick="mostrar('armas', this)">
+                <i class="ti ti-sword"></i>
+                ARMAS
+            </button>
+            <button class="cat-btn" onclick="mostrar('armaduras', this)">
+                <i class="ti ti-shield"></i>
+                ARMADURA
+            </button>
+            <button class="cat-btn" onclick="mostrar('consumiveis', this)">
+                <i class="ti ti-flask"></i>
+                POÇÕES
+            </button>
+            <button class="cat-btn" onclick="mostrar('vender', this)">
+                <i class="ti ti-coin"></i>
+                VENDER
+            </button>
+        </div>
     </div>
 
-    <!-- seção de armaduras -->
-    <div id="armaduras" class="secao">
-        <h2>Armaduras</h2>
-        {% for item in armaduras %}
-            <p>{{ item.nome }} — Defesa +{{ item.bonus_defesa }} — {{ item.preco }} 🪙
-                <a href="{% url 'comprar_item' item.id %}">Comprar</a>
-            </p>
-        {% endfor %}
+    <!-- LADO DIREITO: header + itens + footer -->
+    <div class="lado-direito">
+
+        <div class="loja-header">
+            <span class="loja-titulo">LOJA DO REINO</span>
+            <span class="gold-display">{{ personagem.gold }} 🪙</span>
+        </div>
+
+        <div class="itens-lista">
+
+            <!-- ARMAS -->
+            <div id="armas" class="secao ativa">
+                {% for item in armas %}
+                <div class="item-card">
+                    <div class="item-icon">
+                        {% if item.classes_permitidas == 'mago' %}
+                            <i class="ti ti-wand"></i>
+                        {% elif item.classes_permitidas == 'arqueiro' %}
+                            <i class="ti ti-bow-arrow"></i>
+                        {% elif item.classes_permitidas == 'ladrao' %}
+                            <i class="ti ti-knife"></i>
+                        {% else %}
+                            <i class="ti ti-sword"></i>
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <div class="item-nome">{{ item.nome }}</div>
+                        <div class="item-stats">
+                            {% if item.bonus_ataque %}ATK +{{ item.bonus_ataque }}{% endif %}
+                            {% if item.bonus_mp %} | MP +{{ item.bonus_mp }}{% endif %}
+                            | {{ item.get_classes_permitidas_display|default:item.classes_permitidas|capfirst }}
+                        </div>
+                    </div>
+                    <div class="item-preco">
+                        {{ item.preco }} 💰
+                        <a href="{% url 'comprar_item' item.id %}" class="btn-comprar">COMPRAR</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- ARMADURAS -->
+            <div id="armaduras" class="secao">
+                {% for item in armaduras %}
+                <div class="item-card">
+                    <div class="item-icon">
+                        {% if item.classes_permitidas == 'mago' %}
+                            <i class="ti ti-shirt"></i>
+                        {% elif item.classes_permitidas == 'ladrao' %}
+                            <i class="ti ti-hood"></i>
+                        {% elif item.classes_permitidas == 'arqueiro' %}
+                            <i class="ti ti-shield-half"></i>
+                        {% else %}
+                            <i class="ti ti-shield"></i>
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <div class="item-nome">{{ item.nome }}</div>
+                        <div class="item-stats">
+                            DEF +{{ item.bonus_defesa }}
+                            {% if item.bonus_mp %} | MP +{{ item.bonus_mp }}{% endif %}
+                            | {{ item.classes_permitidas|capfirst }}
+                        </div>
+                    </div>
+                    <div class="item-preco">
+                        {{ item.preco }} 🪙
+                        <a href="{% url 'comprar_item' item.id %}" class="btn-comprar">COMPRAR</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- CONSUMÍVEIS -->
+            <div id="consumiveis" class="secao">
+                {% for item in consumiveis %}
+                <div class="item-card">
+                    <div class="item-icon" style="color: {% if item.bonus_hp and item.bonus_mp %}#a060e0{% elif item.bonus_mp %}#6090e0{% else %}#e06060{% endif %}">
+                        <i class="ti ti-flask"></i>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-nome">{{ item.nome }}</div>
+                        <div class="item-stats">
+                            {% if item.bonus_hp %}HP +{{ item.bonus_hp }}{% endif %}
+                            {% if item.bonus_mp %} | MP +{{ item.bonus_mp }}{% endif %}
+                            | Todos
+                        </div>
+                    </div>
+                    <div class="item-preco">
+                        {{ item.preco }} 🪙
+                        <a href="{% url 'comprar_item' item.id %}" class="btn-comprar">COMPRAR</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- VENDER -->
+            <div id="vender" class="secao">
+                {% for inv in inventario %}
+                <div class="item-card">
+                    <div class="item-icon" style="color: #90c070">
+                        <i class="ti ti-coin"></i>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-nome">{{ inv.item.nome }}</div>
+                        <div class="item-stats">Quantidade: {{ inv.qtd }}</div>
+                    </div>
+                    <div class="item-preco">
+                        <span class="vender-preco">{% widthratio inv.item.preco 2 1 %} 🪙</span>
+                        <a href="{% url 'vender_item' inv.item.id %}" class="btn-vender">VENDER</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; color: #6a5a7a; font-size: 7px; padding: 2rem; line-height: 2;">
+                    INVENTÁRIO VAZIO
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <div class="loja-footer">
+            <a href="{% url 'vila' personagem.area_atual %}" class="btn-footer voltar">
+                <i class="ti ti-arrow-left"></i> VOLTAR
+            </a>
+        </div>
+
     </div>
+</div>
 
-    <!-- seção de consumíveis -->
-    <div id="consumiveis" class="secao">
-        <h2>Consumíveis</h2>
-        {% for item in consumiveis %}
-            <p>{{ item.nome }} — HP +{{ item.bonus_hp }} MP +{{ item.bonus_mp }} — {{ item.preco }} 🪙
-                <a href="{% url 'comprar_item' item.id %}">Comprar</a>
-            </p>
-        {% endfor %}
-    </div>
+<script>
+    function mostrar(secao, btn) {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('ativo'));
+        document.getElementById(secao).classList.add('ativa');
+        if (btn) btn.classList.add('ativo');
+    }
+</script>
 
-    <!-- seção de vender -->
-    <div id="vender" class="secao">
-        <h2>Vender Itens</h2>
-        {% for inv in inventario %}
-            <p>{{ inv.item.nome }} x{{ inv.qtd }} — Vender por {% widthratio inv.item.preco 2 1 %} 🪙
-                <a href="{% url 'vender_item' inv.item.id %}">Vender</a>
-            </p>
-        {% endfor %}
-    </div>
-
-    <!-- javascript para trocar as abas -->
-    <script>
-        function mostrar(secao) {
-            // esconde todas as seções
-            document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
-            // mostra a seção clicada
-            document.getElementById(secao).classList.add('ativa');
-        }
-        // mostra armas por padrão ao abrir
-        mostrar('armas');
-    </script>
-
-    <br>
-    <a href="{% url 'vila' personagem.area_atual %}">Voltar à Vila</a>
 </body>
 </html>
