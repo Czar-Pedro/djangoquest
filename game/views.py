@@ -307,7 +307,11 @@ def iniciar_batalha(request):
         inimigos = list(Inimigo.objects.filter(area=personagem.area_atual, is_boss=False))
         pesos = [i.peso for i in inimigos]
         inimigo = random.choices(inimigos, weights=pesos, k=1)[0]
-        quantidade = random.randint(inimigo.qtd_min, inimigo.qtd_max)
+        
+        # sorteia quantidade com peso decrescente (1 é mais comum que 2, que é mais comum que 3)
+        quantidade_opcoes = list(range(inimigo.qtd_min, inimigo.qtd_max + 1))
+        pesos_qtd = [1 / q for q in quantidade_opcoes]
+        quantidade = random.choices(quantidade_opcoes, weights=pesos_qtd, k=1)[0]
 
     # salva sessão (vale pra boss e inimigo normal)
     request.session['batalha'] = {
