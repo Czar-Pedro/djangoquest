@@ -395,16 +395,18 @@ def acao_batalha(request):
         defesa_base = personagem.defesa + (personagem.armadura_equipada.bonus_defesa if personagem.armadura_equipada else 0)
         # aplica bônus de 30% se estiver defendendo
         defesa_atual = int(defesa_base * 1.3) if batalha['defendendo'] else defesa_base
+        # fator de horda — cada inimigo adicional contribui 70% do dano
+        fator_horda = 1 + (quantidade - 1) * 0.7
         # calcula dano do inimigo ao personagem
-        dano_inimigo = max(1, inimigo.ataque - defesa_atual)
+        dano_inimigo = max(1, int((inimigo.ataque - defesa_atual) * fator_horda))
         personagem.hp_atual -= dano_inimigo
         mensagem += f' {inimigo.nome} causou {dano_inimigo} de dano em você!'
     batalha['defendendo'] = False
     
    # --- VERIFICA SE O INIMIGO MORREU ---
     if inimigo_hp <= 0:
-        personagem.experiencia += inimigo.experiencia
-        personagem.gold += inimigo.gold
+        personagem.experiencia += inimigo.experiencia * quantidade
+        personagem.gold += inimigo.gold * quantidade
         personagem.batalhas_na_area += 1
         personagem.save()
         
@@ -435,8 +437,8 @@ def acao_batalha(request):
         request.session['resultado'] = {
             'resultado': 'vitoria',
             'inimigo_nome': inimigo.nome,
-            'exp_ganho': inimigo.experiencia,
-            'gold_ganho': inimigo.gold,
+            'exp_ganho': inimigo.experiencia * quantidade,  # muda aqui
+            'gold_ganho': inimigo.gold * quantidade,        # e aqui
             'subiu_nivel': subiu_nivel,
             'nivel_atual': personagem.nivel,
             'area_desbloqueada': area_desbloqueada,
