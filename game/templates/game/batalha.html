@@ -1,95 +1,503 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Django Quest - Batalha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
     <style>
-        .secao { display: none; }
-        .secao.ativa { display: block; }
-        #painel-itens { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        {% if personagem.area_atual == 'floresta' %}
+        .bg { background-image: url("{% static 'game/TkSK9.jpg' %}"); }
+        {% elif personagem.area_atual == 'caverna' %}
+        .bg { background-image: url("{% static 'game/batalha_caverna.jpg' %}"); }
+        {% elif personagem.area_atual == 'castelo' %}
+        .bg { background-image: url("{% static 'game/batalha_castelo.jpg' %}"); }
+        {% endif %}
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .batalha-wrap {
+            position: relative;
+            z-index: 2;
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* --- TOPO --- */
+        .topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1.5rem 2rem 1rem;
+        }
+
+        .inimigo-info {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #5a3a6a;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            min-width: 220px;
+        }
+
+        .inimigo-nome {
+            font-size: 0.6vw;
+            color: #e0c0ff;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .boss-coroa { color: #f5d080; margin-left: 4px; }
+
+        .barra-wrap { margin-top: 4px; }
+
+        .barra-label {
+            font-size: 0.5vw;
+            color: #9070b0;
+            margin-bottom: 3px;
+        }
+
+        .barra {
+            width: 180px;
+            height: 8px;
+            border: 1px solid #4a3060;
+            border-radius: 4px;
+            background: #1a0a2a;
+            overflow: hidden;
+        }
+
+        .barra-fill-hp { height: 100%; background: #c03060; border-radius: 4px; transition: width 0.3s; }
+        .barra-fill-hp-inimigo { height: 100%; background: #a02020; border-radius: 4px; transition: width 0.3s; }
+        .barra-fill-mp { height: 100%; background: #3060c0; border-radius: 4px; transition: width 0.3s; }
+
+        .batalha-contador {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #4a3a2a;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.5vw;
+            color: #c8b090;
+            letter-spacing: 1px;
+        }
+
+        /* --- ARENA --- */
+        .arena {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .inimigo-img {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 20px rgba(180, 80, 255, 0.4));
+            animation: flutuar 3s ease-in-out infinite;
+        }
+
+        @keyframes flutuar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* --- MENSAGEM --- */
+        .mensagem-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem 2rem;
+        }
+
+        .mensagem-box {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #5a3a6a;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.55vw;
+            color: #e0c0ff;
+            letter-spacing: 1px;
+            line-height: 1.8;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        /* --- BASE --- */
+        .base {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 1rem 2rem 1.5rem;
+            gap: 1rem;
+        }
+
+        .personagem-info {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #4a3a2a;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            min-width: 220px;
+        }
+
+        .personagem-nome {
+            font-size: 0.6vw;
+            color: #c8b090;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .acoes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .acoes-principais {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-acao {
+            background: rgba(20,10,40,0.85);
+            border: 1.5px solid #7a5a9a;
+            border-radius: 8px;
+            color: #c8a0e8;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5vw;
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 80px;
+        }
+
+        .btn-acao i { font-size: 20px; }
+        .btn-acao:hover { background: rgba(90,40,130,0.9); border-color: #c080f0; color: #fff; }
+        .btn-acao.fugir { border-color: #6a5030; color: #c8a060; }
+        .btn-acao.fugir:hover { background: rgba(80,50,10,0.9); border-color: #c8a040; color: #fff; }
+
+        .btn-itens {
+            background: rgba(20,30,10,0.85);
+            border: 1.5px solid #4a6030;
+            border-radius: 8px;
+            color: #90c060;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5vw;
+            padding: 0.5rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-itens i { font-size: 16px; }
+        .btn-itens:hover { background: rgba(40,80,10,0.9); border-color: #80c040; color: #fff; }
+
+        /* --- PAINEL DE ITENS --- */
+        .painel-itens {
+            display: none;
+            position: fixed;
+            bottom: 120px;
+            right: 2rem;
+            z-index: 10;
+            background: rgba(10,5,20,0.95);
+            border: 1.5px solid #5a3a6a;
+            border-radius: 10px;
+            padding: 1rem;
+            width: 280px;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+
+        .painel-itens::-webkit-scrollbar { width: 4px; }
+        .painel-itens::-webkit-scrollbar-thumb { background: #5a3a7a; border-radius: 4px; }
+
+        .painel-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(40,20,60,0.8);
+            border: 1px solid #5a3a7a;
+            border-radius: 6px;
+            color: #9070b0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 6px;
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tab-btn.ativo { background: rgba(90,40,130,0.9); border-color: #c080f0; color: #fff; }
+        .tab-btn i { font-size: 14px; }
+
+        .secao { display: none; flex-direction: column; gap: 6px; }
+        .secao.ativa { display: flex; }
+
+        .item-linha {
+            background: rgba(30,15,50,0.7);
+            border: 1px solid #4a3060;
+            border-radius: 6px;
+            padding: 7px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .item-linha-info {
+            font-size: 6px;
+            color: #c0a0e0;
+            line-height: 1.6;
+        }
+
+        .item-linha-stats {
+            font-size: 5px;
+            color: #7050a0;
+        }
+
+        .btn-usar {
+            background: rgba(60,30,10,0.8);
+            border: 1px solid #8a5020;
+            border-radius: 5px;
+            color: #f5d080;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 5px;
+            padding: 4px 7px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .btn-usar:hover { background: rgba(100,60,10,0.9); border-color: #c8a040; }
+
+        .item-vazio {
+            font-size: 6px;
+            color: #5a4060;
+            text-align: center;
+            padding: 1rem;
+        }
     </style>
 </head>
 <body>
-    <h1>⚔️ Batalha!</h1>
 
-    <h2>{{ inimigo.nome }} {% if inimigo.is_boss %}👑{% endif %}</h2>
-    <p>HP: {{ inimigo_hp }}/{{ inimigo.hp }}</p>
+    <div class="bg"></div>
+    <div class="bg-overlay"></div>
 
-    <hr>
+    <div class="batalha-wrap">
 
-    <h2>{{ personagem.nome }}</h2>
-    <p>HP: {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</p>
-    <p>MP: {{ personagem.mp_atual }}/{{ personagem.mp_maximo }}</p>
+        <!-- TOPO -->
+        <div class="topo">
+            <div class="inimigo-info">
+                <div class="inimigo-nome">
+                    {% if quantidade > 1 %}{{ quantidade }}x {% endif %}
+                    {{ inimigo.nome }}
+                    {% if inimigo.is_boss %}<span class="boss-coroa">👑</span>{% endif %}
+                </div>
+                <div class="barra-wrap">
+                    <div class="barra-label">HP {{ inimigo_hp }}/{{ inimigo_hp_max }}</div>
+                    <div class="barra">
+                        <div class="barra-fill-hp-inimigo" style="width: {% widthratio inimigo_hp inimigo_hp_max 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="batalha-contador">
+                BATALHA {{ personagem.batalhas_na_area|add:1 }}/5
+            </div>
+        </div>
 
-    {% if mensagem %}
-        <p><strong>{{ mensagem }}</strong></p>
-    {% endif %}
+        <!-- ARENA -->
+        <div class="arena">
+            {% if quantidade == 1 %}
+                <img class="inimigo-img" src="{% static 'game/' %}{{ inimigo.imagem }}" alt="{{ inimigo.nome }}">
+            {% elif quantidade == 2 %}
+                <img class="inimigo-img" src="{% static 'game/' %}{{ inimigo.imagem }}" alt="{{ inimigo.nome }}">
+                <img class="inimigo-img" src="{% static 'game/' %}{{ inimigo.imagem }}" alt="{{ inimigo.nome }}">
+            {% elif quantidade >= 3 %}
+                <img class="inimigo-img" src="{% static 'game/' %}{{ inimigo.imagem }}" alt="{{ inimigo.nome }}">
+                <img class="inimigo-img" src="{% static 'game/' %}{{ inimigo.imagem }}" alt="{{ inimigo.nome }}">
+                <img class="inimigo-img" src="{% static 'game/' %}{{ inimigo.imagem }}" alt="{{ inimigo.nome }}">
+            {% endif %}
+        </div>
 
-    <h3>O que fazer?</h3>
-    <form method="POST" action="{% url 'acao_batalha' %}">
-        {% csrf_token %}
-        <button type="submit" name="acao" value="atacar">⚔️ Atacar</button>
-        <button type="submit" name="acao" value="defender">🛡️ Defender</button>
-        <button type="submit" name="acao" value="fugir">🏃 Fugir ({{ personagem.fugas_restantes }} restantes)</button>
-    </form>
-    <button onclick="toggleItens()">🎒 Itens</button>
+        <!-- MENSAGEM -->
+        {% if mensagem %}
+        <div class="mensagem-wrap">
+            <div class="mensagem-box">{{ mensagem }}</div>
+        </div>
+        {% endif %}
 
-    <!-- painel de itens -->
-    <div id="painel-itens">
-        <h3>Inventário</h3>
-        <button onclick="mostrar('armas')">⚔️ Armas</button>
-        <button onclick="mostrar('armaduras')">🛡️ Armaduras</button>
-        <button onclick="mostrar('consumiveis')">🧪 Consumíveis</button>
+        <!-- BASE -->
+        <div class="base">
 
-        <div id="armas" class="secao">
-            <h4>Armas</h4>
+            <div class="personagem-info">
+                <div class="personagem-nome">{{ personagem.nome }} — {{ personagem.get_classe_display }}</div>
+                <div class="barra-wrap">
+                    <div class="barra-label">HP {{ personagem.hp_atual }}/{{ personagem.hp_maximo }}</div>
+                    <div class="barra">
+                        <div class="barra-fill-hp" style="width: {% widthratio personagem.hp_atual personagem.hp_maximo 100 %}%"></div>
+                    </div>
+                </div>
+                <div class="barra-wrap" style="margin-top: 6px;">
+                    <div class="barra-label">MP {{ personagem.mp_atual }}/{{ personagem.mp_maximo }}</div>
+                    <div class="barra">
+                        <div class="barra-fill-mp" style="width: {% widthratio personagem.mp_atual personagem.mp_maximo 100 %}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acoes">
+                <form method="POST" action="{% url 'acao_batalha' %}">
+                    {% csrf_token %}
+                    <div class="acoes-principais">
+                        <button type="submit" name="acao" value="atacar" class="btn-acao">
+                            <i class="ti ti-sword"></i>
+                            ATACAR
+                        </button>
+                        <button type="submit" name="acao" value="defender" class="btn-acao">
+                            <i class="ti ti-shield"></i>
+                            DEFENDER
+                        </button>
+                        <button type="submit" name="acao" value="fugir" class="btn-acao fugir">
+                            <i class="ti ti-run"></i>
+                            FUGIR ({{ personagem.fugas_restantes }})
+                        </button>
+                    </div>
+                </form>
+                <button class="btn-itens" onclick="toggleItens()">
+                    <i class="ti ti-backpack"></i>
+                    ITENS
+                </button>
+            </div>
+
+            <div class="personagem-info" style="text-align: right;">
+                <div class="personagem-nome">Nível {{ personagem.nivel }}</div>
+                <div class="barra-label" style="margin-top: 4px;">XP {{ personagem.experiencia }}</div>
+                <div class="barra-label" style="margin-top: 4px;">Gold {{ personagem.gold }} 🪙</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PAINEL DE ITENS -->
+    <div class="painel-itens" id="painel-itens">
+        <div class="painel-tabs">
+            <button class="tab-btn" onclick="mostrar('consumiveis', this)">
+                <i class="ti ti-flask"></i> POÇÕES
+            </button>
+            <button class="tab-btn" onclick="mostrar('armas', this)">
+                <i class="ti ti-sword"></i> ARMAS
+            </button>
+            <button class="tab-btn" onclick="mostrar('armaduras', this)">
+                <i class="ti ti-shield"></i> ARMADURAS
+            </button>
+        </div>
+
+        <div id="consumiveis" class="secao ativa">
             {% for inv in inventario %}
-                {% if inv.item.tipo == 'arma' %}
-                    <p>{{ inv.item.nome }} x{{ inv.qtd }} — Ataque +{{ inv.item.bonus_ataque }}</p>
+                {% if inv.item.tipo == 'consumivel' %}
+                <div class="item-linha">
+                    <div>
+                        <div class="item-linha-info">{{ inv.item.nome }} x{{ inv.qtd }}</div>
+                        <div class="item-linha-stats">
+                            {% if inv.item.bonus_hp > 0 %}+{{ inv.item.bonus_hp }} HP {% endif %}
+                            {% if inv.item.bonus_mp > 0 %}+{{ inv.item.bonus_mp }} MP{% endif %}
+                        </div>
+                    </div>
+                    <form method="POST" action="{% url 'usar_item_batalha' inv.item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-usar">USAR</button>
+                    </form>
+                </div>
                 {% endif %}
             {% empty %}
-                <p>Nenhuma arma.</p>
+                <div class="item-vazio">SEM ITENS</div>
+            {% endfor %}
+        </div>
+
+        <div id="armas" class="secao">
+            {% for inv in inventario %}
+                {% if inv.item.tipo == 'arma' %}
+                <div class="item-linha">
+                    <div>
+                        <div class="item-linha-info">{{ inv.item.nome }} x{{ inv.qtd }}</div>
+                        <div class="item-linha-stats">ATK +{{ inv.item.bonus_ataque }}</div>
+                    </div>
+                </div>
+                {% endif %}
             {% endfor %}
         </div>
 
         <div id="armaduras" class="secao">
-            <h4>Armaduras</h4>
             {% for inv in inventario %}
                 {% if inv.item.tipo == 'armadura' %}
-                    <p>{{ inv.item.nome }} x{{ inv.qtd }} — Defesa +{{ inv.item.bonus_defesa }}</p>
-                {% endif %}
-            {% endfor %}
-        </div>
-
-        <div id="consumiveis" class="secao">
-            <h4>Consumíveis</h4>
-            {% for inv in inventario %}
-                {% if inv.item.tipo == 'consumivel' %}
-                    <form method="POST" action="{% url 'usar_item_batalha' inv.item.id %}">
-                        {% csrf_token %}
-                        <p>{{ inv.item.nome }} x{{ inv.qtd }}
-                           {% if inv.item.bonus_hp > 0 %} +{{ inv.item.bonus_hp }} HP{% endif %}
-                           {% if inv.item.bonus_mp > 0 %} +{{ inv.item.bonus_mp }} MP{% endif %}
-                           <button type="submit">Usar</button>
-                        </p>
-                    </form>
+                <div class="item-linha">
+                    <div>
+                        <div class="item-linha-info">{{ inv.item.nome }} x{{ inv.qtd }}</div>
+                        <div class="item-linha-stats">DEF +{{ inv.item.bonus_defesa }}</div>
+                    </div>
+                </div>
                 {% endif %}
             {% endfor %}
         </div>
     </div>
 
-    <br>
-    <p>Batalha {{ personagem.batalhas_na_area }}/5</p>
-
     <script>
         function toggleItens() {
             const painel = document.getElementById('painel-itens');
-            painel.style.display = painel.style.display === 'none' ? 'block' : 'none';
-            if (painel.style.display === 'block') mostrar('consumiveis');
+            painel.style.display = painel.style.display === 'none' || painel.style.display === '' ? 'block' : 'none';
+            if (painel.style.display === 'block') {
+                mostrar('consumiveis', document.querySelector('.tab-btn'));
+            }
         }
-        function mostrar(secao) {
+
+        function mostrar(secao, btn) {
             document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
             document.getElementById(secao).classList.add('ativa');
+            if (btn) btn.classList.add('ativo');
         }
     </script>
+
 </body>
 </html>
